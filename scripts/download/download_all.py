@@ -81,5 +81,10 @@ def run_all_downloads():
     report_path.write_text(json.dumps(quality_report, indent=2), encoding="utf-8")
     logger.info(f"Dataset quality report generated at {report_path.relative_to(root_dir)}")
 
+    # Also save artifacts/data_download_report.json (Section 9)
+    download_report_path = artifacts_dir / "data_download_report.json"
+    download_report_path.write_text(json.dumps(quality_report, indent=2), encoding="utf-8")
+    logger.info(f"Data download report generated at {download_report_path.relative_to(root_dir)}")
+
 if __name__ == "__main__":
     run_all_downloads()

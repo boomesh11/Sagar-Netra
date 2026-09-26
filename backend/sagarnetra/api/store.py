@@ -54,22 +54,22 @@ class SurveyStore:
                     hazard_confidence REAL NOT NULL,
                     status TEXT NOT NULL,
                     priority REAL NOT NULL,
-                    lat REAL NOT NULL,
-                    lon REAL NOT NULL,
-                    utm_easting REAL NOT NULL,
-                    utm_northing REAL NOT NULL,
-                    zone INTEGER NOT NULL,
-                    r95_m REAL NOT NULL,
+                    lat REAL,
+                    lon REAL,
+                    utm_easting REAL,
+                    utm_northing REAL,
+                    zone INTEGER,
+                    r95_m REAL,
                     position_status TEXT DEFAULT 'AVAILABLE',
                     position_reason TEXT,
                     r95_status TEXT DEFAULT 'AVAILABLE',
                     r95_reason TEXT,
-                    length_m REAL NOT NULL,
-                    width_m REAL NOT NULL,
+                    length_m REAL,
+                    width_m REAL,
                     height_m REAL,
                     height_status TEXT DEFAULT 'AVAILABLE',
                     height_reason TEXT,
-                    orientation_deg REAL NOT NULL,
+                    orientation_deg REAL,
                     views INTEGER DEFAULT 1,
                     components_json TEXT,
                     rules_json TEXT,
@@ -79,7 +79,55 @@ class SurveyStore:
                 )
             """)
 
-            # Migrations for existing database
+            # Schema migration: check if lat has NOT NULL constraint
+            col_info = cursor.execute("PRAGMA table_info(detections)").fetchall()
+            lat_not_null = any(c[1] == "lat" and c[3] == 1 for c in col_info)
+            if lat_not_null:
+                cursor.execute("ALTER TABLE detections RENAME TO detections_old")
+                cursor.execute("""
+                    CREATE TABLE detections (
+                        target_id TEXT PRIMARY KEY,
+                        survey_id TEXT NOT NULL,
+                        class_name TEXT NOT NULL,
+                        source_type TEXT DEFAULT 'REAL',
+                        hazard_confidence REAL NOT NULL,
+                        status TEXT NOT NULL,
+                        priority REAL NOT NULL,
+                        lat REAL,
+                        lon REAL,
+                        utm_easting REAL,
+                        utm_northing REAL,
+                        zone INTEGER,
+                        r95_m REAL,
+                        position_status TEXT DEFAULT 'AVAILABLE',
+                        position_reason TEXT,
+                        r95_status TEXT DEFAULT 'AVAILABLE',
+                        r95_reason TEXT,
+                        length_m REAL,
+                        width_m REAL,
+                        height_m REAL,
+                        height_status TEXT DEFAULT 'AVAILABLE',
+                        height_reason TEXT,
+                        orientation_deg REAL,
+                        views INTEGER DEFAULT 1,
+                        components_json TEXT,
+                        rules_json TEXT,
+                        review_status TEXT DEFAULT 'UNREVIEWED',
+                        created_at TEXT NOT NULL,
+                        FOREIGN KEY (survey_id) REFERENCES surveys (survey_id)
+                    )
+                """)
+                cursor.execute("""
+                    INSERT INTO detections SELECT 
+                        target_id, survey_id, class_name, source_type, hazard_confidence, status, priority,
+                        lat, lon, utm_easting, utm_northing, zone, r95_m, position_status, position_reason,
+                        r95_status, r95_reason, length_m, width_m, height_m, height_status, height_reason,
+                        orientation_deg, views, components_json, rules_json, review_status, created_at
+                    FROM detections_old
+                """)
+                cursor.execute("DROP TABLE detections_old")
+
+            # Migrations for additional columns
             for col, col_def in [
                 ("source_type", "TEXT DEFAULT 'REAL'"),
                 ("position_status", "TEXT DEFAULT 'AVAILABLE'"),

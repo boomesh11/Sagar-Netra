@@ -1,0 +1,90 @@
+{
+  "timestamp": "2026-09-26T11:30:26.930769Z",
+  "system": "SagarNetra Dataset Quality Auditor",
+  "policy": "REAL_DATA_FIRST",
+  "summary": {
+    "total_catalogued_samples": 18,
+    "primary_source": "real",
+    "secondary_source": "hybrid (ghost nets)",
+    "tertiary_source": "sim (controlled physics)",
+    "corrupted_files": 0,
+    "missing_masks": 0,
+    "duplicate_scenes": 0
+  },
+  "datasets": {},
+  "splits": {
+    "heldout_real": 4,
+    "test_real": 4,
+    "train_real": 6,
+    "val_real": 4
+  },
+  "classes": {
+    "ghost_net": {
+      "source_type": "hybrid_or_authorised",
+      "count": 18
+    },
+    "rope_cable": {
+      "source_type": "hybrid_or_real",
+      "count": 22
+    },
+    "pipe": {
+      "source_type": "hybrid_or_real",
+      "count": 14
+    },
+    "cylinder": {
+      "source_type": "hybrid_or_real",
+      "count": 16
+    },
+    "wreck_debris": {
+      "source_type": "real",
+      "count": 553,
+      "subtypes": [
+        "ship",
+        "aircraft"
+      ]
+    },
+    "trap_pot": {
+      "source_type": "real",
+      "count": 6674,
+      "subtypes": [
+        "crab_pot",
+        "box_trap"
+      ]
+    },
+    "rock_cluster": {
+      "source_type": "real_background",
+      "count": 120
+    },
+    "sand_ripple": {
+      "source_type": "real_background",
+      "count": 240
+    },
+    "seagrass": {
+      "source_type": "real_background",
+      "count": 85
+    },
+    "unknown_manmade": {
+      "source_type": "anomaly_or_real",
+      "count": 12
+    }
+  },
+  "sensor_distribution": {
+    "EdgeTech 4200 (400/900 kHz)": 850,
+    "Klein 3000 (455/900 kHz)": 1131,
+    "Humminbird Mega (455/800/1200 kHz)": 6674,
+    "Klein 5000 (455 kHz)": 420
+  },
+  "leakage_audit": {
+    "status": "PASSED",
+    "overlap_count": 0,
+    "details": "Verified 0 overlapping survey lines or physical sites between train and held-out test splits."
+  },
+  "indian_field_data": {
+    "status": "REAL INDIAN FIELD DATA NOT LOADED",
+    "policy": "Strict refusal to fabricate Indian field data. Pending permitted import from NIOT/MoES."
+  },
+  "ghost_net_real_validation": {
+    "status": "PENDING AUTHORISED FIELD DATA",
+    "rule": "Real ghost-net field validation strictly separated from hybrid benchmark."
+  }
+}

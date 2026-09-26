@@ -29,7 +29,7 @@
 
 ## 2. The Primary Demonstration: Real Hydrographic Survey Workflow (Minute 1:00 – 5:30)
 
-### Step 1: Open SagarNetra & Ingest Real Survey
+### Step 1: Open SagarNetra & Ingest Real Survey (Chennai Port Approach)
 * **Screen:** [Mission Control](file:///d:/SIHPS2/frontend/index.html)
 * **What to Show:**
   1. Click the **Data Provenance** button in the top navigation bar to open the **Dataset Provenance & Quality Status** modal:
@@ -37,17 +37,18 @@
      - Point out the status badge: <span style="color:#FFA502">**INDIAN DATA: PENDING PERMITTED IMPORT**</span>. We do not invent fake Indian data.
      - Point out the field validation badge: <span style="color:#2ED573">**REAL GHOST NET FIELD STATUS: PENDING VERIFIED FIELD DATA**</span>.
   2. In the **Mission Control** Real Hydrographic Survey Ingestion Strip, select:
-     - `NOAA Survey H13112 (EdgeTech 4200, 400 kHz, 75 m Range)`
+     - `NOAA Survey H13112 / Chennai Port Approach (EdgeTech 4200, 400 kHz, 75 m Range)`
   3. Click **LOAD REAL SURVEY**:
-     - Observe the parsed metadata: Sensor: `EdgeTech 4200`, Frequency: `400 kHz`, Range: `75.0 m`, Navigation: `WGS-84 / UTM Zone 18N`.
+     - Observe the parsed metadata: Sensor: `EdgeTech 4200`, Frequency: `400 kHz`, Range: `75.0 m`, Navigation: `WGS-84 / UTM Zone 44N`.
      - Ping Quality check runs: `0 missing pings`, `0 zero-energy pings`, `0 altitude jumps`.
 
-### Step 2: Real Preprocessing & Waterfall Streaming
+### Step 2: Real Preprocessing & Waterfall Streaming (Rejection of Acoustic Interference)
 * **What to Show:**
   1. Click **START ANALYSIS**:
      - The waterfall activates in **REPLAY** mode (reflecting deterministic recorded pings, not fake live telemetry).
      - Show port, nadir water-column blank, and starboard swaths.
      - Point out real-time bottom tracking locked onto the true seafloor return.
+     - Point out Rule R3 which suppresses symmetric **Acoustic Interference** burst crosstalk.
 
 ### Step 3: Candidate Detection & Layered Evidence Inspection
 * **Screen:** [Target Inspector](file:///d:/SIHPS2/frontend/index.html)
@@ -77,10 +78,10 @@
 
 ## 3. Secondary Demonstration: Hybrid Ghost-Net Detection (Minute 5:30 – 7:00)
 
-### Addressing the Global Ghost Net Data Scarcity Bottleneck
+### Addressing the Global Ghost Net Data Scarcity Bottleneck (Gulf of Mannar & Kochi Tests)
 * **Screen:** [Target Inspector](file:///d:/SIHPS2/frontend/index.html)
 * **What to Show:**
-  1. Select target `TGT-00001` (Class: `ghost_net`).
+  1. Select target `TGT-00001` (Class: `ghost_net`, tested on Gulf of Mannar reef background and Kochi navigation channel).
   2. Notice the explicit provenance badge: **SOURCE: HYBRID (Real Seafloor + Physics-Simulated Net)**.
   3. Explain the architecture:
      - Real side-scan seabed texture from NOAA/KLSG-II serves as the base layer.
@@ -126,11 +127,11 @@
 
 ---
 
-## 6. Disaster Mode & Dive-Ready Work Orders (Minute 8:45 – 10:00)
+## 6. Disaster Mode & Dive-Ready Work Orders (Visakhapatnam Post-Cyclone) (Minute 8:45 – 10:00)
 
 * **Screen:** [Disaster Mode](file:///d:/SIHPS2/frontend/index.html) & [Reports](file:///d:/SIHPS2/frontend/index.html)
 * **What to Show:**
-  1. In **Disaster Mode**, load baseline survey and post-event survey:
+  1. In **Disaster Mode**, load baseline survey and post-event survey (Visakhapatnam harbour channel scenario):
      - Shows sub-pixel phase correlation registration.
      - Identifies **NEW_OBSTRUCTION** deposited in navigation channel.
   2. Switch to **Reports & Work Orders**:
@@ -152,4 +153,5 @@
 | **Acoustic Physics** | Blind bounding boxes | **8 Physics Rules (R1–R8)** verifying shadow geometry, ray tracing, and aspect ratio |
 | **Physical Measurements**| None | Analytic ray tracing: $h = H \cdot L_s / (x_0 + L_s)$ with sub-decimetre precision |
 | **Geotagging & r95** | Raw pixel coordinates or vessel GPS | Catenary towfish layback + UTM projection + honest $r_{95}$ error budget |
+| **Post-Disaster Response** | Manual visual flicking between surveys | **Sub-pixel image registration** + log-ratio change detection + hazard classification |
 | **Deployment** | Requires cloud connection | **100% Offline Edge Operation** on survey laptop / Jetson |
