@@ -258,13 +258,15 @@
               </div>
             </div>
 
-            <!-- Operator Review Controls -->
+            <!-- Operator Decision-Support Review Actions -->
             <div class="review-actions-bar">
-              <span class="review-label">Operator Review:</span>
-              <button class="btn btn-confirm" id="btnConfirmTarget">✓ Confirm Hazard</button>
-              <button class="btn btn-reclassify" id="btnReclassifyTarget">✎ Reclassify</button>
-              <button class="btn btn-reject" id="btnRejectTarget">✕ Reject False Alarm</button>
-              <button class="btn btn-unsure" id="btnUnsureTarget">? Flag Unsure</button>
+              <span class="review-label">Candidate Review Action:</span>
+              <button class="btn btn-confirm" id="btnAcceptFollowup" title="Accept for follow-up inspection (worth investigating)">✓ Accept for Follow-Up</button>
+              <button class="btn btn-reject" id="btnRejectCandidate" title="Reject candidate as natural seafloor or transient noise">✕ Reject Candidate</button>
+              <button class="btn btn-unsure" id="btnRequestSecondLook" title="Request observation-aware second look">↻ Request Second Look</button>
+            </div>
+            <div class="review-disclaimer" style="font-size:0.75rem; color:var(--text-muted); margin-top:0.4rem; font-style:italic;">
+              * Note: Acceptance indicates candidate is worth investigating; it does not constitute physical proof of object identity.
             </div>
           </div>
         </div>
@@ -276,13 +278,16 @@
       <div class="coverage-layout">
         <div class="panel coverage-main">
           <div class="panel-header">
-            <h3>Quantitative Seabed Clearance Map (Probability of Detection ≥ 0.80)</h3>
+            <h3>Observation Adequacy & Clearance Grid (1m Resolution)</h3>
             <div class="coverage-legend">
-              <span class="legend-item"><span class="legend-color clear-color"></span> Surveyed Clear</span>
-              <span class="legend-item"><span class="legend-color candidate-color"></span> Hazard Candidate</span>
-              <span class="legend-item"><span class="legend-color insufficient-color"></span> Insufficient Evidence</span>
-              <span class="legend-item"><span class="legend-color unsurveyed-color"></span> Not Surveyed</span>
+              <span class="legend-item"><span class="legend-color clear-color"></span> OBSERVED — NO CANDIDATE DETECTED</span>
+              <span class="legend-item"><span class="legend-color candidate-color"></span> CANDIDATE PRESENT</span>
+              <span class="legend-item"><span class="legend-color insufficient-color"></span> OBSERVATION LIMITED</span>
+              <span class="legend-item"><span class="legend-color unsurveyed-color"></span> NOT SURVEYED</span>
             </div>
+          </div>
+          <div class="coverage-warning-banner" style="background:rgba(251,191,36,0.12); border-left:3px solid var(--accent-amber); padding:0.5rem 0.8rem; font-size:0.8rem; color:var(--accent-amber); margin:0.5rem 1rem;">
+            ⚠ <strong>Operational Notice:</strong> "No candidate detected" does NOT establish the absence of marine debris. Clearance requires adequate grazing geometry and high detection probability.
           </div>
           <div class="coverage-canvas-wrapper">
             <canvas id="coverageCanvas" width="680" height="460"></canvas>

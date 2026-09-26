@@ -121,6 +121,7 @@
         setupDatasetModal();
         setupRealSurveyLoader();
         setupLayerToggles();
+        setupReviewActions();
         initWaterfall();
         initNavMap();
         initCoverageMap();
@@ -619,25 +620,68 @@
     function renderRulesTable(tgt) {
         if (!el.rulesTableBody) return;
         const rules = [
-            { id: 'R1', name: 'Class Height Prior', cond: 'h <= 1.5m for net', val: `${tgt.height_m || 1.15}m`, pass: (tgt.height_m || 1.15) <= 1.5 },
-            { id: 'R2', name: 'Highlight Before Shadow', cond: 'x_shadow > x_hl', val: 'Consistent down-range', pass: true },
-            { id: 'R3', name: 'Port/Stbd Interference Veto', cond: 'No mirror on opp. side', val: 'Unilateral detection', pass: true },
-            { id: 'R4', name: 'Along-track Footprint Persistence', cond: 'Spans >= 3 pings', val: '7 consecutive pings', pass: true },
-            { id: 'R5', name: 'Water-Column Blind Zone Veto', cond: 'Range >= Nadir altitude', val: '28.4m > 8.1m alt', pass: true },
-            { id: 'R6', name: 'Surface Multipath Mask', cond: 'Range != 2x Depth', val: 'Clear of surface zone', pass: true },
-            { id: 'R7', name: 'Resolution Adequacy Check', cond: 'Along-track px >= 3', val: 'Adequate grazing (18°)', pass: true },
-            { id: 'R8', name: 'Seafloor Slope Instability', cond: 'Local seabed slope < 5°', val: 'Slope 1.4° (stable)', pass: true }
+            { id: 'E1 / R1', name: 'Class Height Prior', cond: 'h <= 1.5m for net', state: (tgt.height_m || 1.15) <= 1.5 ? 'SUPPORTS' : 'CONFLICTS', val: `${tgt.height_m || 1.15}m` },
+            { id: 'E2 / R2', name: 'Highlight Before Shadow', cond: 'x_shadow > x_hl', state: 'SUPPORTS', val: 'Consistent down-range ray causality' },
+            { id: 'E3 / R3', name: 'Interference / Crosstalk Veto', cond: 'No mirror on opp. side', state: 'SUPPORTS', val: 'Unilateral backscatter return' },
+            { id: 'E4 / R4', name: 'Along-Track Persistence', cond: 'Spans >= 2 pings', state: 'SUPPORTS', val: '7 consecutive ping returns' },
+            { id: 'E5 / R5', name: 'Water-Column & Nadir Context', cond: 'Range >= Nadir altitude', state: 'SUPPORTS', val: 'Clear of pre-bottom & nadir zone' },
+            { id: 'E6 / R6', name: 'Surface Multipath Mask', cond: 'Range != 2x Depth', state: 'SUPPORTS', val: 'Clear of surface bounce' },
+            { id: 'E7 / R7', name: 'Resolution Adequacy Check', cond: 'Footprint >= 3 samples', state: 'SUPPORTS', val: 'Adequate grazing (18°)' },
+            { id: 'E8 / R8', name: 'Seafloor Slope Gradient', cond: 'Local slope < 5°', state: 'SUPPORTS', val: 'Slope 1.4° (acoustic contrast reliable)' }
         ];
 
-        el.rulesTableBody.innerHTML = rules.map(r => `
-            <tr>
-                <td style="font-weight:700; color:#00D4B2;">${r.id}</td>
-                <td>${r.name}</td>
-                <td style="color:#8FA3BF;">${r.cond}</td>
-                <td>${r.val}</td>
-                <td><span class="badge ${r.pass ? 'badge-confirmed' : 'badge-hazard'}">${r.pass ? 'PASS' : 'FAIL'}</span></td>
-            </tr>
-        `).join('');
+        el.rulesTableBody.innerHTML = rules.map(r => {
+            let badgeClass = 'badge-confirmed';
+            let badgeText = 'SUPPORTS';
+            if (r.state === 'CONFLICTS') {
+                badgeClass = 'badge-hazard';
+                badgeText = 'CONFLICTS';
+            } else if (r.state === 'NOT_ASSESSABLE') {
+                badgeClass = 'badge-pending';
+                badgeText = 'NOT ASSESSABLE';
+            }
+            return `
+                <tr>
+                    <td style="font-weight:700; color:#2DD4BF;">${r.id}</td>
+                    <td>${r.name}</td>
+                    <td style="color:#94A3B8;">${r.cond}</td>
+                    <td>${r.val}</td>
+                    <td><span class="badge ${badgeClass}">${badgeText}</span></td>
+                </tr>
+            `;
+        }).join('');
+    }
+
+    // Wire operator decision-support review actions
+    function setupReviewActions() {
+        const handleReview = (action, actionLabel) => {
+            const curTarget = state.targets[state.selectedTargetIdx];
+            if (!curTarget) return;
+            const srvId = curTarget.survey_id || 'SRV_REAL_001';
+            const tid = curTarget.target_id;
+
+            fetch(`/api/surveys/${srvId}/detections/${tid}/review`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: action, notes: `Reviewed as ${actionLabel}` })
+            })
+            .then(res => res.json())
+            .then(data => {
+                curTarget.review_status = action;
+                curTarget.status = action === 'REJECT_CANDIDATE' ? 'REJECTED' : (action === 'ACCEPT_FOR_FOLLOWUP' ? 'ACCEPTED_FOR_FOLLOWUP' : 'SECOND_LOOK_REQUESTED');
+                alert(`Decision Recorded: ${actionLabel} for Target ${tid}.\nProvenance: Traceable candidate record updated.`);
+                renderTargetList();
+            })
+            .catch(err => {
+                curTarget.review_status = action;
+                alert(`Decision Recorded (Local): ${actionLabel} for Target ${tid}`);
+                renderTargetList();
+            });
+        };
+
+        document.getElementById('btnAcceptFollowup')?.addEventListener('click', () => handleReview('ACCEPT_FOR_FOLLOWUP', 'Accept for Follow-up'));
+        document.getElementById('btnRejectCandidate')?.addEventListener('click', () => handleReview('REJECT_CANDIDATE', 'Reject Candidate'));
+        document.getElementById('btnRequestSecondLook')?.addEventListener('click', () => handleReview('REQUEST_SECOND_LOOK', 'Request Second Look'));
     }
 
     // --- SCREEN 3: COVERAGE & CLEARANCE ---
