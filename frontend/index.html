@@ -25,6 +25,9 @@
       <button class="nav-tab active" data-tab="mission-control">
         <span class="icon">🌊</span> Mission Control
       </button>
+      <button class="nav-tab" data-tab="echosift-lab">
+        <span class="icon">🔬</span> EchoSift Physics Lab
+      </button>
       <button class="nav-tab" data-tab="target-inspector">
         <span class="icon">🔍</span> Target Inspector
       </button>
@@ -42,14 +45,19 @@
       </button>
     </nav>
 
-    <!-- Operational System Status Indicators -->
+    <!-- Operational System Status Indicators & Edge Mode Toggle -->
     <div class="status-panel">
+      <div class="edge-mode-switch" style="display:flex; align-items:center; gap:4px; background:rgba(0,0,0,0.4); padding:2px 6px; border-radius:6px; border:1px solid var(--border-color);">
+        <span style="font-size:0.7rem; color:var(--text-sub); font-family:var(--font-mono);">DEPLOY:</span>
+        <button class="btn btn-sm btn-primary" id="btnEchoShore" style="padding:2px 8px; font-size:0.72rem;">Shore (Full)</button>
+        <button class="btn btn-sm btn-outline" id="btnEchoJetson" style="padding:2px 8px; font-size:0.72rem;">Jetson INT8</button>
+      </div>
       <button class="btn btn-outline btn-sm" id="btnOpenDatasetStatus">📊 Data Provenance</button>
       <div class="telemetry-badge">
         <span class="dot-online"></span>
         <span id="systemStatus">REPLAY ENGINE</span>
       </div>
-      <div class="device-badge">CPU INFERENCE &lt; 20ms</div>
+      <div class="device-badge" id="edgeTelemetryBadge">CPU 18.5 FPS | 42ms</div>
     </div>
   </header>
 
@@ -477,6 +485,254 @@
             </table>
           </div>
         </div>
+      </div>
+    </section>
+
+    <!-- SCREEN 7: ECHOSIFT PHYSICS LAB -->
+    <section class="tab-pane" id="pane-echosift-lab">
+      <!-- 1. Pipeline Execution Stepper & Survey Ingest Strip -->
+      <div class="real-survey-strip" style="margin-bottom:0.75rem;">
+        <div class="survey-meta-chip">
+          <span>Target Survey</span>
+          <span style="font-weight:700; color:#2DD4BF;">Chennai Coast Line 07 (SRV_CHENNAI_LINE_07)</span>
+        </div>
+        <div class="survey-meta-chip">
+          <span>Acoustic Sensor</span>
+          <span>EdgeTech 4200 (Dual 120/410 kHz)</span>
+        </div>
+        <div class="survey-meta-chip">
+          <span>Towfish Altitude</span>
+          <span id="echoTowfishAlt">8.1 m</span>
+        </div>
+        <div class="survey-meta-chip">
+          <span>Survey Line Length</span>
+          <span>1.85 km (1,482 pings)</span>
+        </div>
+        <div class="survey-meta-chip">
+          <span>Swath Range</span>
+          <span>±60.0 m</span>
+        </div>
+        <div class="survey-meta-chip">
+          <span>Edge Deployment</span>
+          <span class="source-badge source-badge-real" id="echoDeployBadge">SHORE (FULL)</span>
+        </div>
+      </div>
+
+      <!-- 8-Stage Acoustic Pipeline Stepper -->
+      <div class="echosift-stepper">
+        <div class="step-item step-completed"><span class="step-num">1</span> Ingest XTF</div>
+        <div class="step-arrow">→</div>
+        <div class="step-item step-completed"><span class="step-num">2</span> Slant-Range Corr.</div>
+        <div class="step-arrow">→</div>
+        <div class="step-item step-completed"><span class="step-num">3</span> Lee Despeckle</div>
+        <div class="step-arrow">→</div>
+        <div class="step-item step-completed"><span class="step-num">4</span> Motion Mask</div>
+        <div class="step-arrow">→</div>
+        <div class="step-item step-completed"><span class="step-num">5</span> YOLO Detection</div>
+        <div class="step-arrow">→</div>
+        <div class="step-item step-active"><span class="step-num">6</span> Physics Verification</div>
+        <div class="step-arrow">→</div>
+        <div class="step-item step-completed"><span class="step-num">7</span> Multi-Pass Geotag</div>
+        <div class="step-arrow">→</div>
+        <div class="step-item step-completed"><span class="step-num">8</span> Intelligence Report</div>
+      </div>
+
+      <!-- Headline Demo Control: Raw CNN vs Physics-Verified -->
+      <div class="echosift-demo-bar">
+        <div class="demo-toggle-group">
+          <span class="demo-toggle-title">DETECTION PIPELINE MODE:</span>
+          <button class="btn btn-sm btn-outline" id="btnEchoRawMode">⚠️ Raw CNN Proposals (No Physics)</button>
+          <button class="btn btn-sm btn-primary active" id="btnEchoPhysicsMode">🛡️ Physics-Verified (EchoSift)</button>
+        </div>
+        <div class="demo-status-banner" id="echoStatusBanner">
+          <span class="banner-icon">🛡️</span>
+          <span id="echoBannerText"><b>PHYSICS VERIFICATION ACTIVE:</b> 2 False Positives Suppressed (Flat Sediment Patch &amp; Motion Dropout). 1 High-Confidence Ghost Net Confirmed (91.2%, Height 1.2m, 2 Survey Passes).</span>
+        </div>
+        <div class="export-group" style="display:flex; gap:0.5rem;">
+          <a href="/api/echosift/export/geojson" class="btn btn-sm btn-primary" download="echosift_detections.geojson">⬇ GeoJSON</a>
+          <a href="/api/echosift/export/csv" class="btn btn-sm btn-outline" download="echosift_detections.csv">⬇ CSV</a>
+          <a href="/api/echosift/export/kml" class="btn btn-sm btn-outline" download="echosift_detections.kml">⬇ KML</a>
+          <a href="/api/echosift/export/json" class="btn btn-sm btn-outline" download="echosift_report.json">⬇ JSON</a>
+        </div>
+      </div>
+
+      <!-- Main Workspace: Dual Split Layout -->
+      <div class="echosift-workspace-grid">
+        <!-- LEFT: Sonar Waterfall Canvas with Overlays & Hydrographic Map -->
+        <div class="echosift-left-col">
+          <!-- Waterfall Viewer Panel -->
+          <div class="panel echosift-waterfall-panel">
+            <div class="panel-header" style="padding:0.5rem 0.75rem; border-bottom:1px solid var(--border-color); display:flex; justify-content:space-between; align-items:center;">
+              <h3 style="font-size:0.9rem; margin:0;">Sonar Waterfall Viewer (Port / Nadir / Starboard)</h3>
+              <div class="canvas-toggles" style="display:flex; gap:0.75rem; font-size:0.75rem;">
+                <label style="cursor:pointer;"><input type="checkbox" id="chkEchoMotionMask" checked> Motion-Artifact Mask</label>
+                <label style="cursor:pointer;"><input type="checkbox" id="chkEchoShadows" checked> Acoustic Shadows</label>
+                <label style="cursor:pointer;"><input type="checkbox" id="chkEchoNadir" checked> Nadir Centerline</label>
+              </div>
+            </div>
+            <div class="waterfall-canvas-container" style="position:relative; background:#050B14; overflow:hidden; border-radius:0 0 6px 6px;">
+              <canvas id="echoWaterfallCanvas" width="680" height="380" style="display:block; width:100%; height:auto;"></canvas>
+            </div>
+          </div>
+
+          <!-- Hydrographic Map Viewer Panel -->
+          <div class="panel echosift-map-panel" style="margin-top:0.75rem;">
+            <div class="panel-header" style="padding:0.5rem 0.75rem; border-bottom:1px solid var(--border-color); display:flex; justify-content:space-between; align-items:center;">
+              <h3 style="font-size:0.9rem; margin:0;">Georeferenced Survey Swath &amp; Hazard Pin</h3>
+              <span style="font-size:0.75rem; font-family:var(--font-mono); color:#2DD4BF;">UTM Zone 44N | WGS84 Geodetic</span>
+            </div>
+            <div class="map-canvas-container" style="position:relative; background:#07101E; border-radius:0 0 6px 6px;">
+              <canvas id="echoMapCanvas" width="680" height="220" style="display:block; width:100%; height:auto;"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- RIGHT: Detections List & Explainable Evidence Card -->
+        <div class="echosift-right-col">
+          <!-- Candidates List Panel -->
+          <div class="panel echosift-targets-panel">
+            <div class="panel-header" style="padding:0.5rem 0.75rem; border-bottom:1px solid var(--border-color); display:flex; justify-content:space-between; align-items:center;">
+              <h3 style="font-size:0.9rem; margin:0;">Sonar Candidates List</h3>
+              <span class="badge" id="echoCandidateCountBadge" style="background:#111C2E; border:1px solid #2DD4BF; color:#2DD4BF; font-size:0.75rem;">3 Candidates</span>
+            </div>
+            <div class="targets-list" id="echoTargetsList" style="padding:0.5rem; display:flex; flex-direction:column; gap:0.5rem; max-height:210px; overflow-y:auto;">
+              <!-- Populated via JS -->
+            </div>
+          </div>
+
+          <!-- Explainable Evidence Card Panel -->
+          <div class="panel echosift-evidence-panel" style="margin-top:0.75rem;">
+            <div class="panel-header" style="padding:0.5rem 0.75rem; border-bottom:1px solid var(--border-color); display:flex; justify-content:space-between; align-items:center;">
+              <div>
+                <h3 style="font-size:0.95rem; margin:0;" id="echoCardTitle">TGT-001 — Ghost Fishing Net</h3>
+                <span style="font-size:0.75rem; color:var(--text-sub);" id="echoCardSubtitle">Slant Range: 25.0m | Starboard Swath | Ping 142-168</span>
+              </div>
+              <div style="text-align:right;">
+                <span style="font-size:0.7rem; color:var(--text-sub); display:block;">CALIBRATED CONFIDENCE</span>
+                <span style="font-size:1.3rem; font-weight:800; font-family:var(--font-mono); color:#2DD4BF;" id="echoFusedConfVal">91.2%</span>
+              </div>
+            </div>
+
+            <!-- Suppression Reason Banner (shown if suppressed) -->
+            <div id="echoSuppressedAlert" style="display:none; padding:0.5rem 0.75rem; background:rgba(239,68,68,0.15); border:1px solid #EF4444; color:#FCA5A5; font-size:0.8rem; margin:0.5rem;">
+              <b>⛔ CANDIDATE SUPPRESSED BY PHYSICS VERIFICATION:</b> <span id="echoSuppressionReasonText"></span>
+            </div>
+
+            <!-- The 5 Named Evidence Terms -->
+            <div class="evidence-terms-grid" style="padding:0.75rem; display:flex; flex-direction:column; gap:0.6rem;">
+              <!-- Term 1: CNN Score -->
+              <div class="evidence-term-item">
+                <div style="display:flex; justify-content:space-between; font-size:0.78rem; margin-bottom:2px;">
+                  <span><b>1. Neural Proposal Confidence (z_cnn)</b></span>
+                  <span id="echoCnnVal" style="font-family:var(--font-mono);">0.84 (YOLOv8n INT8)</span>
+                </div>
+                <div class="progress-bar-bg" style="height:6px; background:rgba(255,255,255,0.1); border-radius:3px; overflow:hidden;">
+                  <div id="echoCnnBar" style="height:100%; width:84%; background:#38BDF8; transition:width 0.3s;"></div>
+                </div>
+              </div>
+
+              <!-- Term 2: SHC -->
+              <div class="evidence-term-item">
+                <div style="display:flex; justify-content:space-between; font-size:0.78rem; margin-bottom:2px;">
+                  <span><b>2. Shadow-Highlight Consistency (z_shc)</b></span>
+                  <span id="echoShcVal" style="font-family:var(--font-mono);">0.92 (h = 1.2 m)</span>
+                </div>
+                <div class="progress-bar-bg" style="height:6px; background:rgba(255,255,255,0.1); border-radius:3px; overflow:hidden;">
+                  <div id="echoShcBar" style="height:100%; width:92%; background:#2DD4BF; transition:width 0.3s;"></div>
+                </div>
+                <div style="font-size:0.72rem; color:var(--text-sub); margin-top:2px;" id="echoShcSub">
+                  Formula: h = (L_s · H)/(R + L_s) | Shadow side: <span style="color:#2DD4BF; font-weight:600;">CORRECT (Away from nadir)</span>
+                </div>
+              </div>
+
+              <!-- Term 3: Geometric Regularity -->
+              <div class="evidence-term-item">
+                <div style="display:flex; justify-content:space-between; font-size:0.78rem; margin-bottom:2px;">
+                  <span><b>3. Geometric Regularity Index (z_reg)</b></span>
+                  <span id="echoRegVal" style="font-family:var(--font-mono);">0.78</span>
+                </div>
+                <div class="progress-bar-bg" style="height:6px; background:rgba(255,255,255,0.1); border-radius:3px; overflow:hidden;">
+                  <div id="echoRegBar" style="height:100%; width:78%; background:#A78BFA; transition:width 0.3s;"></div>
+                </div>
+                <div style="font-size:0.72rem; color:var(--text-sub); margin-top:2px;" id="echoRegSub">
+                  2D FFT Peak Sharpness: 0.72 | Coherence contrast: Localized Net (distinct from regional sand ripples)
+                </div>
+              </div>
+
+              <!-- Term 4: Motion-Artifact Penalty -->
+              <div class="evidence-term-item">
+                <div style="display:flex; justify-content:space-between; font-size:0.78rem; margin-bottom:2px;">
+                  <span><b>4. Motion-Artifact Overlap Penalty (z_motion)</b></span>
+                  <span id="echoMotionVal" style="font-family:var(--font-mono); color:#10B981;">0.00 (0% overlap)</span>
+                </div>
+                <div class="progress-bar-bg" style="height:6px; background:rgba(255,255,255,0.1); border-radius:3px; overflow:hidden;">
+                  <div id="echoMotionBar" style="height:100%; width:0%; background:#EF4444; transition:width 0.3s;"></div>
+                </div>
+                <div style="font-size:0.72rem; color:var(--text-sub); margin-top:2px;">
+                  Telemetry roll/pitch check &amp; cross-correlation: clean ping sequence (&lt;40% threshold)
+                </div>
+              </div>
+
+              <!-- Term 5: Multi-Pass Persistence -->
+              <div class="evidence-term-item">
+                <div style="display:flex; justify-content:space-between; font-size:0.78rem; margin-bottom:2px;">
+                  <span><b>5. Multi-Pass Persistence (z_persist)</b></span>
+                  <span id="echoPersistVal" style="font-family:var(--font-mono); color:#FBBF24;">0.85 (Seen in 2 lines)</span>
+                </div>
+                <div class="progress-bar-bg" style="height:6px; background:rgba(255,255,255,0.1); border-radius:3px; overflow:hidden;">
+                  <div id="echoPersistBar" style="height:100%; width:85%; background:#FBBF24; transition:width 0.3s;"></div>
+                </div>
+                <div style="font-size:0.72rem; color:var(--text-sub); margin-top:2px;" id="echoPassesList">
+                  Spatial join (&le;5m): SRV_CHENNAI_LINE_07 &amp; SRV_CHENNAI_LINE_08
+                </div>
+              </div>
+            </div>
+
+            <!-- Analyst Feedback & Active Learning Controls -->
+            <div style="padding:0.75rem; border-top:1px solid var(--border-color); display:flex; justify-content:space-between; align-items:center; background:rgba(0,0,0,0.2);">
+              <div style="font-size:0.75rem; color:var(--text-sub);">
+                <span>Active Learning Pool:</span>
+                <span style="font-weight:700; color:#10B981; margin-left:4px;">Accepted: <span id="echoAcceptedCount">0</span></span> |
+                <span style="font-weight:700; color:#EF4444; margin-left:4px;">Rejected: <span id="echoRejectedCount">0</span></span>
+              </div>
+              <div style="display:flex; gap:0.5rem;">
+                <button class="btn btn-sm btn-outline" id="btnEchoReject" style="border-color:#EF4444; color:#FCA5A5;">Reject Candidate</button>
+                <button class="btn btn-sm btn-primary" id="btnEchoAccept" style="background:#10B981; border-color:#10B981;">Accept for Follow-up</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Performance & Reliability Analytics Strip -->
+      <div class="metrics-strip" style="margin-top:0.75rem;">
+        <div class="metric-card alert-card">
+          <span class="metric-label">FALSE POSITIVES SUPPRESSED</span>
+          <span class="metric-val" id="echoMetricSuppressed">66.7%</span>
+          <span class="metric-sub">2 of 3 CNN alerts removed</span>
+        </div>
+        <div class="metric-card">
+          <span class="metric-label">CONFIRMED HAZARDS</span>
+          <span class="metric-val" id="echoMetricConfirmed">1 Target</span>
+          <span class="metric-sub">Ghost Net (1.2m height)</span>
+        </div>
+        <div class="metric-card">
+          <span class="metric-label">EDGE INFERENCE SPEED</span>
+          <span class="metric-val" id="echoMetricFps">18.5 tiles/s</span>
+          <span class="metric-sub" id="echoMetricLatency">42.1 ms latency</span>
+        </div>
+        <div class="metric-card">
+          <span class="metric-label">GEOTAG UNCERTAINTY</span>
+          <span class="metric-val">r95 = 1.4 m</span>
+          <span class="metric-sub">Heading ±90° slant-proj</span>
+        </div>
+        <div class="metric-card">
+          <span class="metric-label">CALIBRATION STATUS</span>
+          <span class="metric-val" style="color:#2DD4BF;">Brier = 0.082</span>
+          <span class="metric-sub">6-Param Logistic Fitted</span>
+        </div>
+      </div>
+    </section>
   </main>
 
   <!-- Real Data Provenance & Quality Status Modal -->

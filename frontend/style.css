@@ -941,3 +941,175 @@ body.dark-theme {
   color: var(--accent-cyan);
   margin-bottom: 0.4rem;
 }
+
+/* ==============================================================================
+   SCREEN 7: ECHOSIFT PHYSICS LAB STYLES
+   ============================================================================== */
+.echosift-stepper {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  overflow-x: auto;
+  margin-bottom: 0.75rem;
+}
+
+.step-item {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.75rem;
+  font-family: var(--font-mono);
+  color: var(--text-sub);
+  white-space: nowrap;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+}
+
+.step-item.step-completed {
+  color: var(--text-main);
+}
+
+.step-item.step-active {
+  background: rgba(45, 212, 191, 0.15);
+  border: 1px solid var(--accent-cyan);
+  color: var(--accent-cyan);
+  font-weight: 600;
+}
+
+.step-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  font-size: 0.65rem;
+}
+
+.step-active .step-num {
+  background: var(--accent-cyan);
+  color: #0B1220;
+  font-weight: 700;
+}
+
+.step-arrow {
+  color: var(--border-color);
+  font-size: 0.8rem;
+}
+
+.echosift-demo-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  background: rgba(17, 28, 46, 0.9);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  padding: 0.6rem 0.85rem;
+  margin-bottom: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.demo-toggle-group {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.demo-toggle-title {
+  font-size: 0.72rem;
+  font-family: var(--font-mono);
+  color: var(--text-sub);
+  letter-spacing: 0.5px;
+}
+
+.demo-status-banner {
+  flex: 1;
+  min-width: 280px;
+  background: rgba(45, 212, 191, 0.08);
+  border: 1px solid rgba(45, 212, 191, 0.3);
+  padding: 0.4rem 0.75rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  color: var(--text-main);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.demo-status-banner.alert-mode {
+  background: rgba(245, 158, 11, 0.1);
+  border-color: rgba(245, 158, 11, 0.4);
+}
+
+.echosift-workspace-grid {
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  gap: 1rem;
+}
+
+@media (max-width: 1024px) {
+  .echosift-workspace-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.echosift-target-card {
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  padding: 0.6rem 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.echosift-target-card:hover {
+  background: rgba(45, 212, 191, 0.08);
+  border-color: var(--accent-cyan);
+}
+
+.echosift-target-card.active {
+  background: rgba(45, 212, 191, 0.12);
+  border-color: var(--accent-cyan);
+  box-shadow: 0 0 10px rgba(45, 212, 191, 0.2);
+}
+
+.echosift-target-card.suppressed {
+  opacity: 0.65;
+  border-color: rgba(239, 68, 68, 0.4);
+  background: rgba(239, 68, 68, 0.05);
+}
+
+.echosift-target-card.suppressed:hover {
+  opacity: 0.9;
+  border-color: #EF4444;
+}
+
+.target-badge-suppressed {
+  font-size: 0.68rem;
+  font-family: var(--font-mono);
+  background: rgba(239, 68, 68, 0.2);
+  color: #FCA5A5;
+  border: 1px solid rgba(239, 68, 68, 0.5);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.target-badge-verified {
+  font-size: 0.68rem;
+  font-family: var(--font-mono);
+  background: rgba(45, 212, 191, 0.2);
+  color: #2DD4BF;
+  border: 1px solid rgba(45, 212, 191, 0.5);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
