@@ -142,13 +142,38 @@
 
 ---
 
-## M9 — FastAPI Backend, WebSocket Streaming, SQLite Review Store & Multi-Format Reports (NEXT)
+## M9 — FastAPI Backend, WebSocket Streaming, SQLite Review Store & Multi-Format Reports ✅
+**Date**: 2026-09-26  
+**Status**: COMPLETE (4/4 tests passed, 69/69 total)  
+**Acceptance**:
+- SQLite Persistent Store (`backend/sagarnetra/api/store.py`):
+  - Database tables for surveys, detections, confidence components, rule evaluation logs, and operator reviews (`CONFIRMED`, `REJECTED`, `CHANGED_CLASS`, `UNSURE`)
+  - Full CRUD with filtering by survey ID, triage status, and minimum confidence threshold
+- Multi-Format Clearance Work-Order Generator (`backend/sagarnetra/report/generator.py`):
+  - **JSON**: Full hierarchical inspection report with confidence terms, physics rules, and error budgets
+  - **CSV**: Standard dive manifest with target coordinates, dimensions, search box side ($2 \times r_{95}$), and priorities
+  - **GeoJSON**: FeatureCollection containing point pins, 95% circular error probable polygons, and second-look LineStrings
+  - **KML**: 3D Google Earth GIS overlay with styled hazard placemarks
+  - **ReportLab PDF**: Professional multi-page clearance work-order with NIOT / MoES header, priority manifest, and target evidence cards
+- FastAPI Application & WebSocket Stream (`backend/sagarnetra/api/app.py`):
+  - REST endpoints: `/api/health`, `/api/surveys`, `/api/surveys/{id}/detections`, `/api/surveys/{id}/detections/{id}/review`, `/api/surveys/{id}/clearance`, `/api/surveys/{id}/reports/{fmt}`, `/api/disaster/scenarios`, `/api/disaster/compare`
+  - Real-time WebSocket streaming (`/ws/waterfall`) emitting dual port/starboard acoustic pings and live detections at ~12 pings/second
+- Acceptance tests: `tests/test_m9_api.py` (4/4 passed, 69/69 total)
+
+---
+
+## M10 — React Dashboard, SonarForge Lab, Demo Script & Final Evaluation Metrics (NEXT)
 **Status**: NEXT
-- `backend/sagarnetra/api/app.py`: FastAPI application serving REST endpoints and live WebSocket ping stream
-- `backend/sagarnetra/api/store.py`: SQLite / SQLModel persistent store for surveys, detections, and operator review states (`CONFIRMED`, `REJECTED`, `CHANGED_CLASS`, `UNSURE`)
-- `backend/sagarnetra/report/generator.py`: Work-order and clearance report generation:
-  - Formats: JSON, CSV, GeoJSON (pins, outlines, coverage, second-look lines), KML, and PDF work-order
-  - Target ranking by Priority score with diver/ROV search box ($2 \times r_{95}$)
+- Offline React dashboard interface with dark operations console aesthetic (navy `#0A2540`, cyan accent `#00D4B2`, amber warnings `#F5A623`, hazard red `#E53E3E`):
+  - Screen 1: Mission Control (live waterfall scrolling with coloured segmentation masks + leaflet map overlay)
+  - Screen 2: Target Inspector (crop inspection, height diagram, confidence breakdown bars, rule log, operator review buttons)
+  - Screen 3: Coverage & Clearance (PoD heat map, second-look lines, clearance summary in $\text{km}^2$)
+  - Screen 4: Disaster Compare (before/after swipe comparison with `NEW_OBSTRUCTION` list)
+  - Screen 5: SonarForge Lab (interactive physics sliders for seabed preset, net length, burial, range, altitude, and SNR)
+  - Screen 6: Reports & Work Orders (one-click downloads for JSON, CSV, GeoJSON, KML, and PDF)
+- `DEMO_SCRIPT.md`: Step-by-step judge demonstration script proving core problem statement resolution and competitive differentiators
+- Final evaluation metrics artifact `artifacts/metrics/final_evaluation_metrics.json`
+
 
 
 
