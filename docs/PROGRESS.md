@@ -88,9 +88,42 @@
 
 ---
 
-## M7 — Physics Verifier & Calibrated Confidence Fusion (NEXT)
+## M7 — Physics Verifier & Calibrated Confidence Fusion ✅
+**Date**: 2026-09-26  
+**Status**: COMPLETE (7/7 tests passed, 56/56 total)  
+**Acceptance**:
+- Eight-rule Acoustic Physics Verifier (`backend/sagarnetra/verify/rules.py`):
+  - $R_1$: Class height prior evaluation (net $0\text{--}1.5\text{ m}$, rope $0\text{--}0.35\text{ m}$, pipe $0.08\text{--}1.5\text{ m}$, cylinder $0.15\text{--}2.0\text{ m}$, wreck $0.4\text{--}15.0\text{ m}$, trap $0.2\text{--}1.3\text{ m}$)
+  - $R_2$: Causal highlight-before-shadow ray order with anti-causal depression rejection
+  - $R_3$: Port/starboard symmetric crosstalk mirror echo rejection
+  - $R_4$: Along-track beam persistence check (minimum 2 consecutive pings; rejects transient noise)
+  - $R_5$: Water column pre-bottom echo rejection ($r < 0.95 \cdot H$)
+  - $R_6$: Nadir blind zone ($x < 1.0\text{ m}$) and surface bounce multipath rejection ($r \approx 2H$)
+  - $R_7$: Beam footprint resolution adequacy ($\text{extent} \ge 2.5 \cdot F_h$)
+  - $R_8$: Local seabed slope planar geometry validity ($\text{slope} \le 5^\circ$)
+  - Calculates physical target height from acoustic shadow geometry: $h = \frac{H \cdot L_s}{x_0 + L_s}$
+- Temperature Scaling Calibration (`backend/sagarnetra/confidence/calibrate.py`):
+  - Optimizer tunes temperature parameter $T > 0$ on validation logits via negative log-likelihood
+  - Expected Calibration Error (ECE) and Maximum Calibration Error (MCE) evaluated across 10 confidence bins
+  - Generated reliability diagram saved to `artifacts/plots/reliability_diagram.png`
+  - Calibration parameters saved to `artifacts/models/temperature_calibration.json`
+  - Calibration metrics saved to `artifacts/metrics/m7_calibration_metrics.json`
+- Calibrated Hazard Confidence Fusion (`backend/sagarnetra/confidence/fusion.py`):
+  - Unified confidence formula:
+    $$C = 100 \cdot \text{sigmoid}\left(w_0 + w_{\text{cal}}\text{logit}(p_{\text{cal}}) + w_{\text{obs}}Q_{\text{obs}} + w_{\text{phys}}V_{\text{phys}} + w_{\text{net}}S_{\text{net}} + w_{\text{views}}\min(\text{views}, 3)\right)$$
+  - Four-tier honest operational triage: `CONFIRMED_HAZARD` ($C \ge 60\%$), `SUSPECTED_HAZARD` ($35\% \le C < 60\%$), `CONFUSER_REJECTED`, and `INSUFFICIENT_EVIDENCE`
+  - Operational priority ranking with position error attenuation $\frac{1}{1 + r_{95}/10}$ and sensitive shipping channel/reef multiplier ($\times 1.5$)
+- Acceptance tests: `tests/test_m7_verifier.py` (7/7 passed, 56/56 total)
+
+---
+
+## M8 — Geotagging, Dimensions, Coverage/PoD Clearance Map & Disaster Mode (NEXT)
 **Status**: NEXT
-- `backend/sagarnetra/verify/rules.py`: Eight acoustic physics rules (R1 to R8) for highlight-shadow pairing, geometry, aspect ratio, anti-causal rejection, and confuser suppression
-- `backend/sagarnetra/confidence/calibrate.py`: Temperature scaling calibration ($T$) on validation logits, reliability diagram generation, Expected Calibration Error (ECE) calculation ($\le 0.05$ target)
-- `backend/sagarnetra/confidence/fusion.py`: Hazard Confidence formula $C \in [0, 100]$ fusing calibrated classifier probability ($p_{\text{cal}}$), shadow length consistency ($S_{\text{geom}}$), Net Signature evidence ($S_{\text{net}}$), SNR margin ($S_{\text{snr}}$), and survey quality ($Q_{\text{ping}}$); assigns honest triage status (`CONFIRMED_HAZARD`, `SUSPECTED_HAZARD`, `CONFUSER_REJECTED`, `INSUFFICIENT_EVIDENCE`)
+- `backend/sagarnetra/geo/project.py`: GPS to UTM projection (zones 43N, 44N, 45N for Indian coastline), layback calculation ($L = \sqrt{C_{\text{out}}^2 - D_{\text{tow}}^2}$), towfish position interpolation, across-track offset to WGS84 latitude/longitude
+- `backend/sagarnetra/geo/error_budget.py`: Full 5-component error budget ($\sigma_{\text{gps}}, \sigma_L, \sigma_\theta, \sigma_x, \sigma_t$) with 95% circular error probable radius $r_{95} = 2.45 \cdot \sigma_{\text{tot}}$
+- `backend/sagarnetra/geo/dimensions.py`: Oriented minimum bounding box on ground-range mask computing physical length, width, orientation, footprint area, and height
+- `backend/sagarnetra/track/associate.py`: Multi-view detection association across survey lines using overlapping error ellipses
+- `backend/sagarnetra/coverage/pod_map.py`: Grid clearance map computing cell-by-cell Probability of Detection (PoD) for reference net and cylinder targets, clearance states (`SURVEYED_CLEAR`, `INSUFFICIENT`, `NOT_SURVEYED`, `CANDIDATE`), and second-look orthogonal line generator
+- `backend/sagarnetra/change/disaster.py`: Pre/post-cyclone survey registration, log-ratio intensity comparison, and `NEW_OBSTRUCTION` change detection for Indian ports
+
 
