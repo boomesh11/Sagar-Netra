@@ -71,8 +71,26 @@
 
 ---
 
-## M6 — YOLO Training, ONNX Export & Anomaly Head (NEXT)
+## M6 — YOLO Training, ONNX/TorchScript Export & Anomaly Head ✅
+**Date**: 2026-09-26  
+**Status**: COMPLETE (7/7 tests passed, 49/49 total)  
+**Acceptance**:
+- Stage B Sonar Segmentation Network (`backend/sagarnetra/detect/yolo_onnx.py`): `SagarNetraSegNet` lightweight architecture tailored to 3-channel physics feature stack (16 -> 32 -> 64 -> 128 channels, skip connections, dual mask + class heads) with < 20 ms CPU latency
+- `SonarDetector` inference runner with automatic device placement, post-processing, and connected component polygon/bbox extraction
+- PatchCore-Lite anomaly head (`backend/sagarnetra/detect/anomaly.py`): multi-scale patch embeddings, coreset memory bank from nominal Indian seabed tiles, and kNN distance anomaly scoring to detect post-cyclone unknown man-made debris
+- Training pipelines (`training/train_yolo.py`, `training/train_anomaly.py`, `training/export_onnx.py`):
+  - Model weights saved: `artifacts/models/sagarnetra_seg_quick.pt`
+  - PatchCore bank saved: `artifacts/models/patchcore_bank.npz` (1,024 coreset embeddings)
+  - Compiled TorchScript saved: `artifacts/models/sagarnetra_seg.torchscript`
+  - Parity verification verified: $|\max \text{diff}| = 0.000000$ (exact bitwise parity between eager PyTorch and compiled execution)
+  - Model metrics saved: `artifacts/metrics/m6_model_metrics.json`
+- Acceptance tests: `tests/test_m6_model.py` (7/7 passed, 49/49 total)
+
+---
+
+## M7 — Physics Verifier & Calibrated Confidence Fusion (NEXT)
 **Status**: NEXT
-- `backend/sagarnetra/detect/yolo_onnx.py`: YOLO11n-seg / lightweight segmentation head on 3-channel physics feature stack + ONNX runtime inference
-- `backend/sagarnetra/detect/anomaly.py`: PatchCore-lite anomaly detector (frozen ResNet18 layer2+3 features, coreset memory bank, kNN distance) detecting "unknown_manmade" objects post-disaster
-- Training scripts: `training/train_yolo.py` (quick + full mode), `training/train_anomaly.py`, `training/export_onnx.py`
+- `backend/sagarnetra/verify/rules.py`: Eight acoustic physics rules (R1 to R8) for highlight-shadow pairing, geometry, aspect ratio, anti-causal rejection, and confuser suppression
+- `backend/sagarnetra/confidence/calibrate.py`: Temperature scaling calibration ($T$) on validation logits, reliability diagram generation, Expected Calibration Error (ECE) calculation ($\le 0.05$ target)
+- `backend/sagarnetra/confidence/fusion.py`: Hazard Confidence formula $C \in [0, 100]$ fusing calibrated classifier probability ($p_{\text{cal}}$), shadow length consistency ($S_{\text{geom}}$), Net Signature evidence ($S_{\text{net}}$), SNR margin ($S_{\text{snr}}$), and survey quality ($Q_{\text{ping}}$); assigns honest triage status (`CONFIRMED_HAZARD`, `SUSPECTED_HAZARD`, `CONFUSER_REJECTED`, `INSUFFICIENT_EVIDENCE`)
+
