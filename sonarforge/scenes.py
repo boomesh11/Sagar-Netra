@@ -94,7 +94,7 @@ def generate_scene(
 
     for obj_idx, obj in enumerate(config.objects):
         height_map, material_map, mask = place_object_on_heightmap(
-            height_map, material_map, obj, ground_res_m=0.10
+            height_map, material_map, obj, ground_res_m=seabed_gen.RESOLUTION_M
         )
         instance_masks[obj_idx] = mask
         truth_records.append(SceneTruthRecord(
@@ -154,6 +154,8 @@ def generate_scene(
             pitch_deg=nav.pitch_deg,
             roll_deg=nav.roll_deg,
             range_m=config.range_m,
+            sample_interval_s=(2.0 * (config.range_m / max(len(stbd_samples), 1))) / 1500.0,
+            sound_speed_mps=1500.0,
             frequency_hz=config.frequency_hz,
             stbd=stbd_samples.tolist(),
             port=port_samples.tolist(),

@@ -48,7 +48,19 @@
 
 ---
 
-## M4 — CFAR Candidate Detection & Net Signature Head (NEXT)
-**Status**: IN PROGRESS
-- `backend/sagarnetra/detect/cfar.py`: 2D OS-CFAR (guard 3, train 16, Pfa 1e-3) + shadow pairing
-- `backend/sagarnetra/detect/net_signature.py`: LoG float/sinker blob detector, MST chain regularity, ridge length >= 2m, Gabor mesh texture energy, $S_{net}$ score
+## M4 — CFAR Candidate Detection & Net Signature Head ✅
+**Date**: 2026-09-26  
+**Status**: COMPLETE (9/9 tests passed, 38/38 total)  
+**Acceptance**:
+- 2D OS-CFAR detector (`cfar.py`): highlights, acoustic shadows, and directional far-range highlight-shadow pairing with shadow length estimation and anti-causal rejection
+- Net Signature Head (`net_signature.py`): multi-scale Hessian determinant float/sinker blob detector, MST chain regularity scoring (CV < 0.35), continuous rope ridge length, Gabor mesh texture energy, and human-readable evidence strings
+- Candidate fusion & NMS (`fuse_candidates.py`): merges CFAR and Net Signature candidates with IoU-based Non-Maximum Suppression
+- Evaluation on simulated scenes: PR curve evaluation on SonarForge synthetic scenes with full pipeline verification
+
+---
+
+## M5 — Dataset Builder & DATASET_CARD.md (NEXT)
+**Status**: NEXT
+- `sonarforge/inject.py`: Hybrid injector blending synthetic targets into real seabed backgrounds with matching geometry and K-distribution speckle
+- `sonarforge/dataset_builder.py`: Builds Synthetic (S), Hybrid (H), and Real (R) dataset splits
+- `DATASET_CARD.md`: Comprehensive dataset documentation with class counts, sources, and statistics
