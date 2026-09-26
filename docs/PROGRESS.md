@@ -117,13 +117,38 @@
 
 ---
 
-## M8 — Geotagging, Dimensions, Coverage/PoD Clearance Map & Disaster Mode (NEXT)
+## M8 — Geotagging, Dimensions, Coverage/PoD Clearance Map & Disaster Mode ✅
+**Date**: 2026-09-26  
+**Status**: COMPLETE (9/9 tests passed, 65/65 total)  
+**Acceptance**:
+- Georeferencing & Projection (`backend/sagarnetra/geo/project.py`):
+  - WGS84 $\leftrightarrow$ UTM forward/inverse projection with sub-centimetre precision across Indian coastal zones (UTM 43N, 44N, 45N)
+  - Geometric horizontal layback: $L = \sqrt{\max(C_{\text{out}}^2 - D_{\text{tow}}^2, 0.0)}$ with heading trail offset
+  - Across-track target georeferencing: $E_t = E_f + s \cdot x \cos(\theta_f)$, $N_t = N_f - s \cdot x \sin(\theta_f)$
+- Position Error Budget (`backend/sagarnetra/geo/error_budget.py`):
+  - 5-component error budget ($\sigma_{\text{gps}}, \sigma_L, \sigma_\theta, \sigma_x, \sigma_t$) with 95% circular error probable radius $r_{95} = 2.45 \cdot \sigma_{\text{tot}}$
+- Physical Dimensions (`backend/sagarnetra/geo/dimensions.py`):
+  - Principal Component Analysis (PCA) on ground-range segmentation masks estimating oriented length, width, aspect ratio, footprint area ($\text{m}^2$), and orientation clockwise from North
+- Multi-View Association (`backend/sagarnetra/track/associate.py`):
+  - Spatial clustering of multi-pass detections with overlapping $r_{95}$ uncertainty ellipses, inverse-variance position weighting, refined uncertainty, and multi-view confidence boost
+- Coverage & Clearance Map (`backend/sagarnetra/coverage/pod_map.py`):
+  - Cell-by-cell Probability of Detection (PoD) modeling for reference net ($5\times 2\text{ m}$, 50% burial) and cylinder ($0.6\times 1.5\text{ m}$)
+  - 4-state clearance grid (`SURVEYED_CLEAR`, `CANDIDATE`, `INSUFFICIENT`, `NOT_SURVEYED`) with $\text{km}^2$ coverage summary
+  - Orthogonal second-look survey line planner placing target at $45\%$ swath range
+- Disaster Mode Change Detection (`backend/sagarnetra/change/disaster.py`):
+  - Normalized intensity log-ratio comparison between pre/post-cyclone surveys detecting `NEW_OBSTRUCTION` and `REMOVED` items
+  - Built-in scenarios for Chennai Port, Kochi Channel, and Visakhapatnam Fishing Harbour
+- Acceptance tests: `tests/test_m8_geo.py` (9/9 passed, 65/65 total)
+
+---
+
+## M9 — FastAPI Backend, WebSocket Streaming, SQLite Review Store & Multi-Format Reports (NEXT)
 **Status**: NEXT
-- `backend/sagarnetra/geo/project.py`: GPS to UTM projection (zones 43N, 44N, 45N for Indian coastline), layback calculation ($L = \sqrt{C_{\text{out}}^2 - D_{\text{tow}}^2}$), towfish position interpolation, across-track offset to WGS84 latitude/longitude
-- `backend/sagarnetra/geo/error_budget.py`: Full 5-component error budget ($\sigma_{\text{gps}}, \sigma_L, \sigma_\theta, \sigma_x, \sigma_t$) with 95% circular error probable radius $r_{95} = 2.45 \cdot \sigma_{\text{tot}}$
-- `backend/sagarnetra/geo/dimensions.py`: Oriented minimum bounding box on ground-range mask computing physical length, width, orientation, footprint area, and height
-- `backend/sagarnetra/track/associate.py`: Multi-view detection association across survey lines using overlapping error ellipses
-- `backend/sagarnetra/coverage/pod_map.py`: Grid clearance map computing cell-by-cell Probability of Detection (PoD) for reference net and cylinder targets, clearance states (`SURVEYED_CLEAR`, `INSUFFICIENT`, `NOT_SURVEYED`, `CANDIDATE`), and second-look orthogonal line generator
-- `backend/sagarnetra/change/disaster.py`: Pre/post-cyclone survey registration, log-ratio intensity comparison, and `NEW_OBSTRUCTION` change detection for Indian ports
+- `backend/sagarnetra/api/app.py`: FastAPI application serving REST endpoints and live WebSocket ping stream
+- `backend/sagarnetra/api/store.py`: SQLite / SQLModel persistent store for surveys, detections, and operator review states (`CONFIRMED`, `REJECTED`, `CHANGED_CLASS`, `UNSURE`)
+- `backend/sagarnetra/report/generator.py`: Work-order and clearance report generation:
+  - Formats: JSON, CSV, GeoJSON (pins, outlines, coverage, second-look lines), KML, and PDF work-order
+  - Target ranking by Priority score with diver/ROV search box ($2 \times r_{95}$)
+
 
 
