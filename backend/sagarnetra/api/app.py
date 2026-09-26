@@ -18,6 +18,7 @@ import numpy as np
 from fastapi import FastAPI, HTTPException, Query, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, Response, StreamingResponse
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
 from backend.sagarnetra.api.store import SurveyStore
@@ -296,3 +297,9 @@ async def websocket_waterfall_stream(websocket: WebSocket):
 
     except WebSocketDisconnect:
         pass
+
+
+# --- Static Frontend Dashboard Mounting ---
+FRONTEND_DIR = Path(__file__).resolve().parents[3] / "frontend"
+if FRONTEND_DIR.exists():
+    app.mount("/", StaticFiles(directory=str(FRONTEND_DIR), html=True), name="frontend")

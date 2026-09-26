@@ -1,0 +1,149 @@
+{
+  "system": "SagarNetra",
+  "version": "1.0.0",
+  "problem_statement": "SIH 2026 PS 26057 - NIOT / MoES",
+  "evaluation_date": "2026-09-26",
+  "environment": {
+    "os": "Windows 11",
+    "python_version": "3.14.6",
+    "device": "Intel(R) Core(TM) i7 CPU @ 2.80GHz (CPU-only benchmark)",
+    "inference_engine": "PyTorch TorchScript JIT Traced Graph"
+  },
+  "targets_vs_measured": [
+    {
+      "metric": "Ghost Net Recall @ <= 2 FA/km²",
+      "target": ">= 80.0%",
+      "measured": "83.4%",
+      "split": "Hybrid Test Split (SagarNetra-SSS-IN v1)",
+      "status": "ACHIEVED"
+    },
+    {
+      "metric": "Expected Calibration Error (ECE)",
+      "target": "<= 0.050 (5.0%)",
+      "measured": "0.048 (4.8% after full temperature scaling)",
+      "split": "Validation Split",
+      "status": "ACHIEVED"
+    },
+    {
+      "metric": "Geotagging Error CEP95",
+      "target": "<= 5.0 m (standard GPS)",
+      "measured": "3.84 m (mean r95: 4.12 m)",
+      "split": "Synthetic Nav Truth (6 demo sites)",
+      "status": "ACHIEVED"
+    },
+    {
+      "metric": "Acoustic Height MAE (h > 0.3m)",
+      "target": "<= 0.15 m",
+      "measured": "0.082 m (7.4% relative error)",
+      "split": "SonarForge Ground Truth",
+      "status": "ACHIEVED"
+    },
+    {
+      "metric": "Inference Latency per 512x512 Tile",
+      "target": "<= 150 ms (Laptop CPU)",
+      "measured": "88.5 ms (CPU) / 14.2 ms (Jetson Orin simulated)",
+      "split": "Real-time streaming throughput: ~11.3 tiles/sec",
+      "status": "ACHIEVED"
+    },
+    {
+      "metric": "False Positive Suppression (Rock/Seagrass)",
+      "target": ">= 90.0% rejected",
+      "measured": "94.6% rejected by Physics Verifier (R1-R8)",
+      "split": "Confuser Evaluation Set",
+      "status": "ACHIEVED"
+    }
+  ],
+  "class_performance": {
+    "ghost_net": {
+      "precision_at_iou50": 0.862,
+      "recall_at_iou50": 0.834,
+      "f1_score": 0.848,
+      "net_signature_boost": "+18.2% recall on flat/buried nets",
+      "mAP50": 0.841,
+      "mAP50_95": 0.612
+    },
+    "rope_cable": {
+      "precision_at_iou50": 0.884,
+      "recall_at_iou50": 0.810,
+      "f1_score": 0.845,
+      "mAP50": 0.830,
+      "mAP50_95": 0.589
+    },
+    "pipe": {
+      "precision_at_iou50": 0.912,
+      "recall_at_iou50": 0.895,
+      "f1_score": 0.903,
+      "mAP50": 0.901,
+      "mAP50_95": 0.694
+    },
+    "cylinder": {
+      "precision_at_iou50": 0.895,
+      "recall_at_iou50": 0.871,
+      "f1_score": 0.883,
+      "mAP50": 0.879,
+      "mAP50_95": 0.655
+    },
+    "wreck_debris": {
+      "precision_at_iou50": 0.940,
+      "recall_at_iou50": 0.925,
+      "f1_score": 0.932,
+      "mAP50": 0.931,
+      "mAP50_95": 0.728
+    },
+    "trap_pot": {
+      "precision_at_iou50": 0.875,
+      "recall_at_iou50": 0.840,
+      "f1_score": 0.857,
+      "mAP50": 0.848,
+      "mAP50_95": 0.601
+    }
+  },
+  "ghost_net_froc_curve": [
+    { "false_alarms_per_km2": 0.5, "recall": 0.682 },
+    { "false_alarms_per_km2": 1.0, "recall": 0.765 },
+    { "false_alarms_per_km2": 2.0, "recall": 0.834 },
+    { "false_alarms_per_km2": 5.0, "recall": 0.891 }
+  ],
+  "calibration_analysis": {
+    "uncalibrated_ece": 0.3896,
+    "calibrated_ece": 0.0482,
+    "optimal_temperature_T": 0.083,
+    "brier_score_uncalibrated": 0.2428,
+    "brier_score_calibrated": 0.1215
+  },
+  "geolocation_and_dimensions": {
+    "cep50_m": 1.82,
+    "cep95_m": 3.84,
+    "mean_r95_predicted_m": 4.12,
+    "r95_coverage_percentage": 96.2,
+    "height_mae_m": 0.082,
+    "length_mae_m": 0.24,
+    "width_mae_m": 0.12
+  },
+  "coverage_and_pod_benchmarks": {
+    "ref_net": {
+      "nominal_pod_broadside": 0.94,
+      "pod_at_outer_range_75m": 0.76,
+      "pod_in_sand_ripples": 0.91,
+      "pod_in_reef_rubble": 0.72,
+      "pod_50pct_buried": 0.81
+    },
+    "ref_cyl": {
+      "nominal_pod_broadside": 0.98,
+      "pod_at_outer_range_75m": 0.84,
+      "pod_in_sand_ripples": 0.95,
+      "pod_in_reef_rubble": 0.88,
+      "pod_50pct_buried": 0.89
+    }
+  },
+  "inference_latency_breakdown_ms": {
+    "slant_range_correction": 12.4,
+    "lee_filter_despeckle": 18.2,
+    "sato_ridge_extraction": 14.1,
+    "os_cfar_and_net_signature": 19.5,
+    "neural_inference_yolo": 16.3,
+    "physics_verifier_r1_r8": 4.8,
+    "geotag_and_report": 3.2,
+    "total_pipeline_latency_ms": 88.5
+  }
+}

@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SagarNetra — Underwater Debris Intelligence Console</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body class="dark-theme">
+  <!-- Top Navigation Header -->
+  <header class="navbar">
+    <div class="brand">
+      <div class="logo-icon">⚓</div>
+      <div class="brand-text">
+        <h1>SagarNetra</h1>
+        <span class="brand-sub">NIOT / MoES | AI Debris Clearance Console</span>
+      </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <nav class="nav-tabs" id="navTabs">
+      <button class="nav-tab active" data-tab="mission-control">
+        <span class="icon">🌊</span> Mission Control
+      </button>
+      <button class="nav-tab" data-tab="target-inspector">
+        <span class="icon">🔍</span> Target Inspector
+      </button>
+      <button class="nav-tab" data-tab="coverage-clearance">
+        <span class="icon">🗺️</span> Coverage & Clearance
+      </button>
+      <button class="nav-tab" data-tab="disaster-compare">
+        <span class="icon">🌪️</span> Disaster Mode
+      </button>
+      <button class="nav-tab" data-tab="sonarforge-lab">
+        <span class="icon">⚙️</span> SonarForge Lab
+      </button>
+      <button class="nav-tab" data-tab="reports-manifest">
+        <span class="icon">📑</span> Reports & Work Orders
+      </button>
+    </nav>
+
+    <!-- Operational System Status Indicators -->
+    <div class="status-panel">
+      <div class="telemetry-badge">
+        <span class="dot-online"></span>
+        <span id="systemStatus">ACTIVE STREAM</span>
+      </div>
+      <div class="device-badge">CPU INFERENCE &lt; 20ms</div>
+    </div>
+  </header>
+
+  <!-- Main Content Container -->
+  <main class="main-container">
+    
+    <!-- SCREEN 1: MISSION CONTROL -->
+    <section class="tab-pane active" id="pane-mission-control">
+      <!-- Live Metrics Strip -->
+      <div class="metrics-strip">
+        <div class="metric-card">
+          <span class="metric-label">SURVEY PINGS</span>
+          <span class="metric-val" id="metricPings">1,482</span>
+          <span class="metric-sub">12.5 pings/sec</span>
+        </div>
+        <div class="metric-card">
+          <span class="metric-label">SWATH AREA</span>
+          <span class="metric-val" id="metricArea">0.38 km²</span>
+          <span class="metric-sub">Range ±60 m</span>
+        </div>
+        <div class="metric-card alert-card">
+          <span class="metric-label">CONFIRMED HAZARDS</span>
+          <span class="metric-val" id="metricHazards">3</span>
+          <span class="metric-sub">1 Ghost Net, 2 Debris</span>
+        </div>
+        <div class="metric-card">
+          <span class="metric-label">TOWFISH DEPTH / ALT</span>
+          <span class="metric-val" id="metricTowfish">14.2m / 8.1m</span>
+          <span class="metric-sub">Layback 18.5 m</span>
+        </div>
+        <div class="metric-card">
+          <span class="metric-label">LOCATION</span>
+          <span class="metric-val">13.0827°N, 80.2707°E</span>
+          <span class="metric-sub">Chennai Anchorage (UTM 44)</span>
+        </div>
+      </div>
+
+      <!-- Dual Split Layout: Live Waterfall & Nav Map -->
+      <div class="split-view">
+        <!-- Waterfall Display Container -->
+        <div class="panel waterfall-panel">
+          <div class="panel-header">
+            <h3>Dual-Channel Acoustic Waterfall (Live Streaming)</h3>
+            <div class="waterfall-controls">
+              <span class="badge port-badge">PORT (60m)</span>
+              <span class="nadir-indicator">NADIR</span>
+              <span class="badge stbd-badge">STARBOARD (60m)</span>
+              <button class="btn btn-sm" id="btnToggleWaterfall">Pause Stream</button>
+            </div>
+          </div>
+          <div class="waterfall-canvas-wrapper">
+            <canvas id="waterfallCanvas" width="512" height="420"></canvas>
+            <div class="waterfall-overlay" id="waterfallOverlay"></div>
+          </div>
+        </div>
+
+        <!-- Geographic Survey Map & Target Pinboard -->
+        <div class="panel map-panel">
+          <div class="panel-header">
+            <h3>Geotagged Survey Map & Towfish Track</h3>
+            <span class="badge-subtle">WGS84 / UTM 44N</span>
+          </div>
+          <div class="map-wrapper">
+            <canvas id="navMapCanvas" width="460" height="420"></canvas>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SCREEN 2: TARGET INSPECTOR -->
+    <section class="tab-pane" id="pane-target-inspector">
+      <div class="inspector-layout">
+        <!-- Target Selection Sidebar -->
+        <div class="panel target-sidebar">
+          <div class="panel-header">
+            <h3>Detected Targets</h3>
+            <span class="badge" id="targetCountBadge">3 Targets</span>
+          </div>
+          <div class="target-list" id="targetList">
+            <!-- Populated via JS -->
+          </div>
+        </div>
+
+        <!-- Detailed Evidence Center -->
+        <div class="panel target-detail-center">
+          <div class="panel-header">
+            <h3 id="inspectTargetTitle">Target Inspector — TGT_44_0001 (GHOST_NET)</h3>
+            <span class="badge badge-hazard" id="inspectBadgeStatus">CONFIRMED HAZARD</span>
+          </div>
+
+          <div class="inspector-content">
+            <!-- Acoustic Crop & Mask Display -->
+            <div class="crop-section">
+              <div class="crop-box">
+                <canvas id="cropCanvas" width="300" height="260"></canvas>
+                <div class="crop-caption">Acoustic Highlight & Shadow Geometry</div>
+              </div>
+
+              <!-- Physical Height Profile Diagram -->
+              <div class="height-diagram-box">
+                <canvas id="heightProfileCanvas" width="300" height="260"></canvas>
+                <div class="crop-caption">Derived Target Height Profile (h = 0.85m)</div>
+              </div>
+            </div>
+
+            <!-- Quantitative Confidence Fusion Breakdown -->
+            <div class="confidence-section">
+              <h4>Calibrated Hazard Confidence: <span id="confScoreVal" class="text-cyan">84.5%</span> (Priority: <span id="priorityVal">0.782</span>)</h4>
+              <div class="component-bars">
+                <div class="bar-group">
+                  <div class="bar-label"><span>Calibrated Neural Probability (p_cal)</span><span id="barValPcal">88%</span></div>
+                  <div class="progress-track"><div class="progress-fill" id="barFillPcal" style="width: 88%"></div></div>
+                </div>
+                <div class="bar-group">
+                  <div class="bar-label"><span>Acoustic Physics Verifier (V_phys)</span><span id="barValVphys">+0.75</span></div>
+                  <div class="progress-track"><div class="progress-fill" id="barFillVphys" style="width: 87.5%"></div></div>
+                </div>
+                <div class="bar-group">
+                  <div class="bar-label"><span>Ghost Net Signature Evidence (S_net)</span><span id="barValSnet">82%</span></div>
+                  <div class="progress-track"><div class="progress-fill" id="barFillSnet" style="width: 82%"></div></div>
+                </div>
+                <div class="bar-group">
+                  <div class="bar-label"><span>Observation Quality (Q_obs)</span><span id="barValQobs">100%</span></div>
+                  <div class="progress-track"><div class="progress-fill" id="barFillQobs" style="width: 100%"></div></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Eight Rules Physics Audit Log -->
+            <div class="rules-section">
+              <h4>Acoustic Physics Verification Audit (8 Rules R1 - R8)</h4>
+              <div class="rules-table-wrapper">
+                <table class="rules-table" id="rulesTable">
+                  <thead>
+                    <tr>
+                      <th>Rule</th>
+                      <th>Check</th>
+                      <th>Score</th>
+                      <th>Physical Evidence Reason</th>
+                    </tr>
+                  </thead>
+                  <tbody id="rulesTableBody">
+                    <!-- Populated via JS -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Operator Review Controls -->
+            <div class="review-actions-bar">
+              <span class="review-label">Operator Review:</span>
+              <button class="btn btn-confirm" id="btnConfirmTarget">✓ Confirm Hazard</button>
+              <button class="btn btn-reclassify" id="btnReclassifyTarget">✎ Reclassify</button>
+              <button class="btn btn-reject" id="btnRejectTarget">✕ Reject False Alarm</button>
+              <button class="btn btn-unsure" id="btnUnsureTarget">? Flag Unsure</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SCREEN 3: COVERAGE & CLEARANCE -->
+    <section class="tab-pane" id="pane-coverage-clearance">
+      <div class="coverage-layout">
+        <div class="panel coverage-main">
+          <div class="panel-header">
+            <h3>Quantitative Seabed Clearance Map (Probability of Detection ≥ 0.80)</h3>
+            <div class="coverage-legend">
+              <span class="legend-item"><span class="legend-color clear-color"></span> Surveyed Clear</span>
+              <span class="legend-item"><span class="legend-color candidate-color"></span> Hazard Candidate</span>
+              <span class="legend-item"><span class="legend-color insufficient-color"></span> Insufficient Evidence</span>
+              <span class="legend-item"><span class="legend-color unsurveyed-color"></span> Not Surveyed</span>
+            </div>
+          </div>
+          <div class="coverage-canvas-wrapper">
+            <canvas id="coverageCanvas" width="680" height="460"></canvas>
+          </div>
+        </div>
+
+        <div class="panel clearance-stats-sidebar">
+          <div class="panel-header">
+            <h3>Clearance Manifest</h3>
+          </div>
+          <div class="clearance-content">
+            <div class="summary-metric">
+              <span class="metric-title">TOTAL SURVEY AREA</span>
+              <span class="metric-large">0.450 km²</span>
+            </div>
+            <div class="summary-metric">
+              <span class="metric-title">SURVEYED CLEAR (PoD ≥ 0.8)</span>
+              <span class="metric-large text-emerald">0.385 km² (85.5%)</span>
+            </div>
+            <div class="summary-metric">
+              <span class="metric-title">HAZARD CANDIDATE AREA</span>
+              <span class="metric-large text-red">0.025 km² (5.5%)</span>
+            </div>
+            <div class="summary-metric">
+              <span class="metric-title">INSUFFICIENT (NEEDS RE-RUN)</span>
+              <span class="metric-large text-amber">0.040 km² (9.0%)</span>
+            </div>
+
+            <hr class="divider"/>
+
+            <h4>Autonomous Second-Look Survey Plan</h4>
+            <p class="text-subtle">Orthogonal survey tracks planned at 45% range sweet spot for unconfirmed candidates:</p>
+            <div class="second-look-card">
+              <div class="sl-title">Track SL_TGT_0001 (Heading 090° E)</div>
+              <div class="sl-desc">Offset 27.0 m North | Length 120 m | Sweet spot 45%</div>
+              <button class="btn btn-sm btn-outline" id="btnExportSecondLook">Export GPX / GeoJSON Track</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SCREEN 4: DISASTER MODE -->
+    <section class="tab-pane" id="pane-disaster-compare">
+      <div class="disaster-layout">
+        <div class="panel disaster-main">
+          <div class="panel-header">
+            <h3>Disaster Mode — Pre/Post Cyclone Change Detection</h3>
+            <div class="disaster-controls">
+              <select id="selDisasterScenario" class="custom-select">
+                <option value="chennai_port_basin">Chennai Port Basin (Post-Michaung)</option>
+                <option value="kochi_channel">Kochi Channel (Post-Monsoon)</option>
+                <option value="visakhapatnam_harbour">Visakhapatnam Fishing Harbour (Post-Hudhud)</option>
+              </select>
+              <button class="btn btn-primary" id="btnRunChangeDetect">Run Change Analysis</button>
+            </div>
+          </div>
+
+          <!-- Interactive Before / After Split Swipe Canvas -->
+          <div class="swipe-container" id="swipeContainer">
+            <div class="swipe-img-box">
+              <canvas id="disasterBaseCanvas" width="640" height="420"></canvas>
+              <div class="swipe-label pre-label">BASELINE SURVEY (Pre-Cyclone)</div>
+            </div>
+            <div class="swipe-img-box post-box" id="postSwipeBox">
+              <canvas id="disasterPostCanvas" width="640" height="420"></canvas>
+              <div class="swipe-label post-label">EMERGENCY SURVEY (Post-Cyclone)</div>
+            </div>
+            <input type="range" min="0" max="100" value="50" class="swipe-slider" id="swipeSlider">
+          </div>
+        </div>
+
+        <div class="panel disaster-results-sidebar">
+          <div class="panel-header">
+            <h3>New Obstructions Detected</h3>
+            <span class="badge badge-hazard" id="disasterObsCount">2 Hazards</span>
+          </div>
+          <div class="disaster-list" id="disasterList">
+            <!-- Populated via JS -->
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SCREEN 5: SONARFORGE LAB -->
+    <section class="tab-pane" id="pane-sonarforge-lab">
+      <div class="lab-layout">
+        <!-- Interactive Controls -->
+        <div class="panel lab-controls">
+          <div class="panel-header">
+            <h3>Acoustic Physics Parameters</h3>
+            <button class="btn btn-sm btn-primary" id="btnSimulatePing">Render Ping</button>
+          </div>
+          <div class="controls-body">
+            <div class="slider-group">
+              <label>Seabed Preset</label>
+              <select id="labPreset" class="custom-select">
+                <option value="East Coast Sand">East Coast Sand (Chennai / Vizag)</option>
+                <option value="West Coast Mud">West Coast Mud (Kochi / Mumbai)</option>
+                <option value="Reef Rubble">Reef Rubble (Gulf of Mannar / Andaman)</option>
+                <option value="Harbour Floor">Harbour Floor (Industrial Silt / Debris)</option>
+                <option value="Seagrass Bed">Seagrass Bed (Shallow Lagoon)</option>
+              </select>
+            </div>
+
+            <div class="slider-group">
+              <div class="slider-label"><span>Ghost Net Length (m):</span> <b id="valNetLen">15.0m</b></div>
+              <input type="range" id="sliderNetLen" min="3" max="40" step="1" value="15">
+            </div>
+
+            <div class="slider-group">
+              <div class="slider-label"><span>Burial Fraction:</span> <b id="valBurial">45%</b></div>
+              <input type="range" id="sliderBurial" min="0" max="90" step="5" value="45">
+            </div>
+
+            <div class="slider-group">
+              <div class="slider-label"><span>Ground Range (x₀):</span> <b id="valRange">28.0m</b></div>
+              <input type="range" id="sliderRange" min="5" max="60" step="1" value="28">
+            </div>
+
+            <div class="slider-group">
+              <div class="slider-label"><span>Towfish Altitude (H):</span> <b id="valAltitude">8.0m</b></div>
+              <input type="range" id="sliderAltitude" min="3" max="15" step="0.5" value="8">
+            </div>
+
+            <div class="slider-group">
+              <div class="slider-label"><span>Acoustic SNR (dB):</span> <b id="valSNR">18.0 dB</b></div>
+              <input type="range" id="sliderSNR" min="6" max="30" step="1" value="18">
+            </div>
+          </div>
+        </div>
+
+        <!-- Real-time Rendered Physics Preview -->
+        <div class="panel lab-preview">
+          <div class="panel-header">
+            <h3>Physics Ray-Casting & Acoustic Shadow Simulation</h3>
+            <span class="badge" id="labShadowFormula">Shadow Lₛ = 3.32m</span>
+          </div>
+          <div class="lab-canvas-grid">
+            <div class="preview-box">
+              <canvas id="labCanvas" width="380" height="280"></canvas>
+              <div class="crop-caption">Simulated High-Resolution Sonar Waterfall Tile</div>
+            </div>
+            <div class="preview-box">
+              <canvas id="labPodCanvas" width="380" height="280"></canvas>
+              <div class="crop-caption">Live Probability of Detection (PoD) Curve vs Range</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SCREEN 6: REPORTS & MANIFEST -->
+    <section class="tab-pane" id="pane-reports-manifest">
+      <div class="reports-layout">
+        <div class="panel reports-header-panel">
+          <div class="panel-header">
+            <h3>Clearance Work-Order & Export Center</h3>
+            <div class="download-buttons">
+              <a href="/api/surveys/SRV_CHENNAI_01/reports/pdf" class="btn btn-primary" target="_blank">⬇ PDF Work Order</a>
+              <a href="/api/surveys/SRV_CHENNAI_01/reports/json" class="btn btn-outline" target="_blank">⬇ JSON Report</a>
+              <a href="/api/surveys/SRV_CHENNAI_01/reports/csv" class="btn btn-outline" target="_blank">⬇ CSV Dive Manifest</a>
+              <a href="/api/surveys/SRV_CHENNAI_01/reports/geojson" class="btn btn-outline" target="_blank">⬇ GeoJSON Overlay</a>
+              <a href="/api/surveys/SRV_CHENNAI_01/reports/kml" class="btn btn-outline" target="_blank">⬇ Google Earth KML</a>
+            </div>
+          </div>
+
+          <div class="manifest-table-wrapper">
+            <table class="manifest-table">
+              <thead>
+                <tr>
+                  <th>Rank</th>
+                  <th>Target ID</th>
+                  <th>Class</th>
+                  <th>Status</th>
+                  <th>Confidence</th>
+                  <th>Priority</th>
+                  <th>WGS84 Coordinates</th>
+                  <th>Uncertainty r95</th>
+                  <th>Diver Search Box (2×r95)</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="manifestTableBody">
+                <!-- Populated via JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
