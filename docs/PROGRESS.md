@@ -59,8 +59,20 @@
 
 ---
 
-## M5 — Dataset Builder & DATASET_CARD.md (NEXT)
+## M5 — Dataset Builder & DATASET_CARD.md ✅
+**Date**: 2026-09-26  
+**Status**: COMPLETE (4/4 tests passed, 42/42 total)  
+**Acceptance**:
+- Hybrid injector (`sonarforge/inject.py`): paints physically consistent synthetic debris into real/ambient seabed backgrounds with acoustic shadow projection ($L_s = \frac{h \cdot x_0}{H - h}$), noise floor attenuation, and K-speckle matching
+- Dataset builder (`sonarforge/dataset_builder.py`): builds Synthetic ($S$) and Hybrid ($H$) dataset splits, exports 3-channel feature stack tiles ($512\times 512$), YOLO polygon segmentation annotations, and sidecar physical metadata JSON
+- Generated official dataset `sagarnetra_v1` (60 train, 20 val, 20 test; 100 images, 50 sim / 50 hybrid)
+- `DATASET_CARD.md`: comprehensive benchmark dataset documentation with class counts table, Indian coastal presets, ontology, and license
+- Acceptance tests: `tests/test_m5_dataset.py` (4/4 passed)
+
+---
+
+## M6 — YOLO Training, ONNX Export & Anomaly Head (NEXT)
 **Status**: NEXT
-- `sonarforge/inject.py`: Hybrid injector blending synthetic targets into real seabed backgrounds with matching geometry and K-distribution speckle
-- `sonarforge/dataset_builder.py`: Builds Synthetic (S), Hybrid (H), and Real (R) dataset splits
-- `DATASET_CARD.md`: Comprehensive dataset documentation with class counts, sources, and statistics
+- `backend/sagarnetra/detect/yolo_onnx.py`: YOLO11n-seg / lightweight segmentation head on 3-channel physics feature stack + ONNX runtime inference
+- `backend/sagarnetra/detect/anomaly.py`: PatchCore-lite anomaly detector (frozen ResNet18 layer2+3 features, coreset memory bank, kNN distance) detecting "unknown_manmade" objects post-disaster
+- Training scripts: `training/train_yolo.py` (quick + full mode), `training/train_anomaly.py`, `training/export_onnx.py`

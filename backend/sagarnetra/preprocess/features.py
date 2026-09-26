@@ -32,7 +32,8 @@ def compute_shadow_probability_map(
     # Shadow probability: high when ratio is below shadow_factor
     # Sigmoidal transition around shadow_factor
     steepness = 12.0
-    shadow_prob = 1.0 / (1.0 + np.exp(steepness * (ratio - shadow_factor)))
+    arg = np.clip(steepness * (ratio - shadow_factor), -30.0, 30.0)
+    shadow_prob = 1.0 / (1.0 + np.exp(arg))
     return np.clip(shadow_prob, 0.0, 1.0).astype(np.float32)
 
 
