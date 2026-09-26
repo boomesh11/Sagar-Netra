@@ -26,6 +26,25 @@ class PingFlag(str, Enum):
     ATTITUDE_EXCESS = "attitude_excess"
 
 
+class PingFlags(BaseModel):
+    dropout: bool = False
+    nav_missing: bool = False
+    altitude_jump: bool = False
+    attitude_excess: bool = False
+
+    def to_flag_list(self) -> list[PingFlag]:
+        out = []
+        if self.dropout:
+            out.append(PingFlag.DROPOUT)
+        if self.nav_missing:
+            out.append(PingFlag.NAV_MISSING)
+        if self.altitude_jump:
+            out.append(PingFlag.ALTITUDE_JUMP)
+        if self.attitude_excess:
+            out.append(PingFlag.ATTITUDE_EXCESS)
+        return out
+
+
 class DetectionStatus(str, Enum):
     CANDIDATE = "CANDIDATE"
     LOW_EVIDENCE = "LOW_EVIDENCE"
