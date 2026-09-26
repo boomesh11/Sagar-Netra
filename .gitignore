@@ -1,0 +1,52 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg
+*.egg-info/
+dist/
+build/
+*.so
+.venv/
+venv/
+env/
+.env
+
+# Data (never commit raw data)
+data/raw/
+data/interim/
+data/datasets/
+data/demo_logs/
+
+# Artifacts (generated)
+artifacts/models/*.pt
+artifacts/models/*.onnx
+artifacts/models/*.engine
+artifacts/pod/*.npz
+artifacts/reports/
+
+# Logs
+*.log
+logs/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Node
+node_modules/
+frontend/dist/
+frontend/.vite/
+
+# Docker
+*.env.local
+
+# HuggingFace token
+.hf_token
