@@ -1,0 +1,172 @@
+# SagarNetra Data Sources Registry
+# Real-Data-First Provenance and License Specifications
+
+version: "1.0.0"
+updated_utc: "2026-09-26T15:45:00Z"
+policy: "REAL_DATA_FIRST"
+
+sources:
+  - id: "ghostpot"
+    dataset_name: "Ghost Pot Side-Scan Sonar Detection Dataset"
+    source_url: "https://huggingface.co/datasets/PING-ecosystem/ghostpot"
+    modality: "Side-Scan Sonar (SSS)"
+    sensor: "Humminbird Side-Scan Sonar"
+    frequency_khz: [455, 800]
+    region: "Delaware Bay, USA"
+    licence: "GPL-3.0"
+    access_status: "gated"
+    requires_auth: true
+    env_token_var: "HF_TOKEN"
+    annotation_type: "bounding_boxes (JSONL)"
+    class_mapping:
+      crab_pot: "trap_pot"
+      maybe_crab_pot: "trap_pot"
+    negative_seabed_usable: true
+    intended_use: "Real trap/pot detection & real seabed negative background tiles"
+    restrictions: "Non-commercial hydrographic research under GPL-3.0. Do not label crab pots as ghost nets."
+
+  - id: "sctd"
+    dataset_name: "Side-scan Sonar Target Detection (SCTD 1.0)"
+    source_url: "https://github.com/Y-Rong/SCTD"
+    modality: "Side-Scan Sonar (SSS)"
+    sensor: "Dual-frequency Hydrographic Side-Scan"
+    frequency_khz: [400, 900]
+    region: "Coastal Waters, East Asia"
+    licence: "MIT"
+    access_status: "open"
+    requires_auth: false
+    annotation_type: "Pascal VOC XML (bounding boxes)"
+    class_mapping:
+      ship: "wreck_debris"
+      airplane: "wreck_debris"
+    subtype_mapping:
+      ship: "ship"
+      airplane: "aircraft"
+    negative_seabed_usable: true
+    intended_use: "Real shipwreck and aircraft debris detection"
+    restrictions: "Retain subtype metadata; do not merge into generic unclassified debris."
+
+  - id: "sctd2"
+    dataset_name: "SCTD2 Trap Target Detection & Segmentation"
+    source_url: "https://github.com/sonar-dataset/SCTD2"
+    modality: "Side-Scan Sonar (SSS)"
+    sensor: "Klein 3000 Side-Scan Sonar"
+    frequency_khz: [445, 900]
+    region: "Harbour Approaches"
+    licence: "Apache-2.0"
+    access_status: "open"
+    requires_auth: false
+    annotation_type: "segmentation_masks (PNG)"
+    class_mapping:
+      trap: "trap_pot"
+    negative_seabed_usable: true
+    intended_use: "Real small metallic and mesh cage debris"
+    restrictions: "Derive bounding regions directly from pixel segmentation masks."
+
+  - id: "klsg2"
+    dataset_name: "SeabedObjects-KLSG-II"
+    source_url: "https://github.com/klsg2/SeabedObjects-KLSG-II"
+    modality: "Side-Scan Sonar (SSS)"
+    sensor: "Various Commercial Side-Scan Systems"
+    frequency_khz: [400, 900]
+    region: "Continental Shelf"
+    licence: "CC-BY-4.0"
+    access_status: "open"
+    requires_auth: false
+    annotation_type: "image_folders + boxes"
+    class_mapping:
+      ship: "wreck_debris"
+      airplane: "wreck_debris"
+      seafloor: "confuser_negative"
+    subtype_mapping:
+      ship: "ship"
+      airplane: "aircraft"
+      seafloor: "seabed_background"
+    negative_seabed_usable: true
+    intended_use: "Real wreck debris detection and extensive clean seafloor anomaly/negative background extraction"
+    restrictions: "Seafloor tiles strictly mapped as negative class (never hazard)."
+
+  - id: "ai4shipwrecks"
+    dataset_name: "AI4Shipwrecks Benchmark"
+    source_url: "https://github.com/deep-ocean-lab/AI4Shipwrecks"
+    modality: "Side-Scan Sonar (SSS)"
+    sensor: "EdgeTech 4200 / 4125"
+    frequency_khz: [400, 900]
+    region: "Thunder Bay National Marine Sanctuary & Lake Huron"
+    licence: "CC-BY-NC-4.0"
+    access_status: "open"
+    requires_auth: false
+    annotation_type: "pixel_masks (28 wreck sites)"
+    class_mapping:
+      shipwreck: "wreck_debris"
+    subtype_mapping:
+      shipwreck: "ship"
+    negative_seabed_usable: true
+    intended_use: "Rigorous real held-out test split for large structural marine debris"
+    restrictions: "Non-commercial research use only; maintain separate held-out site split."
+
+  - id: "noaa_usgs_sss"
+    dataset_name: "NOAA NCEI & USGS Hydrographic Side-Scan Archives"
+    source_url: "https://www.ncei.noaa.gov/products/bathymetry-side-scan-sonar"
+    modality: "Raw Hydrographic Side-Scan Sonar (XTF / JSF)"
+    sensor: "EdgeTech 4200, Klein 3000/5000, L3 Klein System"
+    frequency_khz: [100, 400, 900]
+    region: "US Coastal Shelves & Harbours"
+    licence: "Public Domain (US Government Work)"
+    access_status: "open"
+    requires_auth: false
+    annotation_type: "raw_surveys_with_navigation"
+    class_mapping: {}
+    negative_seabed_usable: true
+    intended_use: "Raw XTF/JSF ingestion validation, navigation layback verification, altitude Kalman testing, and natural seabed backgrounds"
+    restrictions: "Preserve raw binary records; do not discard ping headers or navigation coordinates."
+
+  - id: "seafloorai"
+    dataset_name: "SeafloorAI Acoustic Habitat Mapping"
+    source_url: "https://huggingface.co/datasets/seafloorai"
+    modality: "Acoustic Backscatter & Bathymetry Mosaics"
+    sensor: "Multibeam Backscatter & High-Res SSS"
+    region: "Global Marine Protected Areas"
+    licence: "CC-BY-NC-SA-4.0"
+    access_status: "open"
+    requires_auth: false
+    annotation_type: "substrate_classes"
+    class_mapping: {}
+    negative_seabed_usable: true
+    intended_use: "Seabed roughness calibration and substrate texture modeling"
+    restrictions: "Geological substrate maps must NEVER be treated as debris hazard labels."
+
+  - id: "indian_surveys"
+    dataset_name: "Permitted Indian Coastal & Harbour Hydrographic Surveys"
+    source_url: "local://data/real/indian/"
+    modality: "Side-Scan Sonar (XTF / JSF / Raw Imagery + Sidecar Nav)"
+    sensor: "Hydrographic Side-Scan (NIOT / MoES / Coast Guard)"
+    frequency_khz: [100, 450, 900]
+    region: "Indian EEZ (Chennai Port, Gulf of Mannar, Kochi, Mumbai, Visakhapatnam)"
+    licence: "MoES/NIOT Restricted Authorization"
+    access_status: "restricted_local"
+    requires_auth: true
+    annotation_type: "expert_verified_diver_reports"
+    class_mapping:
+      ghost_net: "ghost_net"
+      rope_cable: "rope_cable"
+      pipe: "pipe"
+      cylinder: "cylinder"
+      wreck_debris: "wreck_debris"
+      trap_pot: "trap_pot"
+    negative_seabed_usable: true
+    intended_use: "Highest-priority field validation and operational clearance certification"
+    status_when_missing: "REAL INDIAN FIELD DATA NOT LOADED"
+    restrictions: "Strict confidentiality and non-fabrication. If no files exist in data/real/indian/, system explicitly reports not loaded."
+
+secondary_sources:
+  - id: "s3simulator"
+    dataset_name: "S3Simulator Synthetic Side-Scan Dataset"
+    role: "TERTIARY"
+    intended_use: "Simulator algorithm comparison and baseline pretraining only"
+    restrictions: "Never enter real validation or test splits."
+
+  - id: "marine_debris_fls"
+    dataset_name: "Marine Debris Forward-Looking Sonar (FLS)"
+    role: "EXCLUDED_FROM_SSS"
+    intended_use: "Separate acoustic modality; strictly forbidden from mixing into SSS training."

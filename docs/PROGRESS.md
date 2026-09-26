@@ -189,3 +189,38 @@
   - `DATASET_CARD.md`: SagarNetra-SSS-IN v1 dataset card.
 - Test Suite: `tests/test_m10_demo.py` (6/6 passing).
 - Status: **COMPLETE** ✅ (100% of milestones M0 through M10 implemented and verified).
+
+---
+
+## M11 — Real-Data-First Production Prototype Transformation ✅
+**Date**: 2026-09-26  
+**Status**: COMPLETE (7/7 tests passed, 82/82 total across test suite)  
+**Acceptance**:
+- **Core Principle & Data Hierarchy**:
+  - `REAL DATA = PRIMARY`: Primary source for raw ingestion (EdgeTech 4200, Klein 3000, Humminbird), preprocessing, bottom tracking, detection, evaluation, georeferencing, and work-order reporting.
+  - `HYBRID DATA = SECONDARY`: High-fidelity physics net insertion into real seafloor backgrounds strictly to solve the global ghost net training bottleneck.
+  - `PURE SIMULATION = TERTIARY`: SonarForge preserved as a secondary engineering bench for PoD sweeps and acoustic stress testing.
+  - `INDIAN DATA HONESTY`: Explicitly reports `"REAL INDIAN FIELD DATA NOT LOADED"` until permitted surveys are ingested—zero fabricated Indian field records.
+- **Data Provenance & Registry**:
+  - `data/sources.yaml`: Complete metadata, license mapping, and sensors for GhostPot, SCTD 1.0, SCTD2, SeabedObjects-KLSG-II, AI4Shipwrecks, NOAA NCEI/USGS, and SeafloorAI.
+  - `data/dataset_manifest.json`: System-wide registry with traceable `source_type` across all tiles.
+  - `data/splits/`: Isolated train, val, test, and heldout splits (`train_real.txt`, `val_real.txt`, `test_real.txt`, `heldout_real.txt`).
+  - Leakage protection (`scripts/check_leakage.py`): Enforces survey and site isolation between train and evaluation sets.
+  - Download suite (`scripts/download/`): Non-crashing downloaders for all public datasets with checksum verification.
+- **Metric Separation & Honest Field Validation**:
+  - `artifacts/metrics/real_metrics.json`: Evaluates real wreck debris and trap pots on real held-out data; marks ghost net recall as `"NOT_ESTABLISHED"` (pending verified field data).
+  - `artifacts/metrics/hybrid_metrics.json`: Documents hybrid ghost net recall (83.4% @ 2 FA/km², 4.8% ECE).
+  - `artifacts/metrics/sim_metrics.json`: Controlled SonarForge simulation test bench.
+  - `artifacts/metrics/summary_metrics.json`: Consolidated multi-source dashboard.
+- **Backend & Database Upgrades**:
+  - `backend/sagarnetra/api/store.py`: Upgraded SQLite schema tracking `source_type`, honest status/reasons for position, $r_{95}$, and acoustic height.
+  - `backend/sagarnetra/api/app.py`: Real survey loader endpoint (`POST /api/surveys/load_real`), multi-layer target inspection endpoint (`GET /api/targets/{id}/layers`), dataset status endpoint (`GET /api/datasets/status`), and replay streaming mode.
+  - `backend/sagarnetra/report/generator.py`: Updated CSV, JSON, GeoJSON, KML, and PDF exports to carry `source_type` and honest missing metadata explanations.
+- **Frontend Survey Workstation UI**:
+  - Top navigation bar: "Data Provenance" button opening Dataset Status & Licences modal.
+  - Mission Control: Real Hydrographic Survey Ingestion Strip (select real NOAA / AI4Shipwrecks / KLSG-II survey, load metadata, bottom track, ping quality).
+  - Target Inspector: 8-layer toggle bar (`[RAW | NORMALIZED | DESPECKLED | SHADOW | RIDGE | MASK | NET SIGNATURE | PHYSICS]`) with target source badge (`REAL`, `HYBRID`, `SIM`).
+  - Workstation aesthetics: Professional dark navy hydrographic console with compact engineering typography and real acoustic units.
+- **Test Suite Verification**:
+  - `tests/test_real_data_first.py`: 7/7 passed.
+  - Full regression: 82/82 passed across all modules.

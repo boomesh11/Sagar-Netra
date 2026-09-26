@@ -1,12 +1,20 @@
-# SagarNetra-SSS-IN v1 Dataset Card
+# SagarNetra-SSS-IN v1 Dataset Card (Real-Data-First Edition)
 
-## 1. Overview
-**SagarNetra-SSS-IN v1** is a physics-grounded benchmark dataset designed for automated ghost net, abandoned fishing gear, and underwater marine obstruction detection and sizing in side-scan sonar (SSS) imagery across Indian coastal environments.
+## 1. Overview & Data Hierarchy
+**SagarNetra-SSS-IN v1** is a physics-grounded side-scan sonar (SSS) benchmark dataset designed for automated marine debris, ghost net, and underwater obstruction detection, sizing, and clearance mapping.
 
-Because public side-scan datasets containing verified ghost nets in tropical coastal waters are non-existent, SagarNetra introduces a tripartite dataset architecture:
-1. **Synthetic ($S$)**: High-fidelity 2.5D seabed physics simulation using ray-casting acoustic backscatter and K-distribution speckle modeling across 5 Indian coastal presets.
-2. **Hybrid ($H$)**: Synthetic debris and nets with matching acoustic shadow projection ($L_s = \frac{h \cdot x_0}{H - h}$) and K-speckle statistics injected into ambient seabed backgrounds.
-3. **Real ($R$)**: Real side-scan backgrounds and target logs (NOAA, USGS, Ghost Pot, and SCTD).
+### First Principle: Real-Data-First
+1. **PRIMARY — Real Sonar Data ($R$)**: Real hydrographic side-scan records and public benchmarks (SCTD, SCTD2, SeabedObjects-KLSG-II, AI4Shipwrecks, Ghost Pot, NOAA/USGS). Real data is the primary source for training, evaluation, and background modeling.
+2. **SECONDARY — Hybrid Injected Data ($H$)**: Used exclusively to address the global ghost-net data scarcity bottleneck. Synthetic ghost nets, ropes, and float chains are injected into **real seabed recordings** with matching local $K$-distribution speckle and Poisson-blended boundaries.
+3. **TERTIARY — Pure Simulation ($S$)**: SonarForge physics simulator data used exclusively for controlled acoustic experiments, extreme condition stress testing, and reference target PoD calculation. Pure simulation is **never** used as a primary validation benchmark.
+
+> [!IMPORTANT]
+> **Ghost Net Data Limitation Statement:**  
+> There is currently no verified public side-scan sonar dataset of real ghost nets in Indian or tropical coastal waters. SagarNetra refuses to fabricate field observations or mislabel crab-pot data as ghost nets. Ghost-net performance is reported on hybrid injected benchmarks with the clear statement: *"Real ghost-net field validation: pending verified field data."*
+
+> [!NOTE]
+> **Indian Field Survey Status:**  
+> The directory `data/real/indian/` is reserved for permitted hydrographic surveys from NIOT/MoES. When no local survey files are present, the system explicitly reports **"REAL INDIAN FIELD DATA NOT LOADED"** rather than generating fabricated field substitutes.
 
 ---
 

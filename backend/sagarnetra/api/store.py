@@ -35,6 +35,7 @@ class SurveyStore:
                     survey_id TEXT PRIMARY KEY,
                     site_name TEXT NOT NULL,
                     source_file TEXT,
+                    source_type TEXT DEFAULT 'REAL',
                     created_at TEXT NOT NULL,
                     total_pings INTEGER DEFAULT 0,
                     swath_range_m REAL DEFAULT 60.0,
@@ -49,6 +50,7 @@ class SurveyStore:
                     target_id TEXT PRIMARY KEY,
                     survey_id TEXT NOT NULL,
                     class_name TEXT NOT NULL,
+                    source_type TEXT DEFAULT 'REAL',
                     hazard_confidence REAL NOT NULL,
                     status TEXT NOT NULL,
                     priority REAL NOT NULL,
@@ -58,9 +60,15 @@ class SurveyStore:
                     utm_northing REAL NOT NULL,
                     zone INTEGER NOT NULL,
                     r95_m REAL NOT NULL,
+                    position_status TEXT DEFAULT 'AVAILABLE',
+                    position_reason TEXT,
+                    r95_status TEXT DEFAULT 'AVAILABLE',
+                    r95_reason TEXT,
                     length_m REAL NOT NULL,
                     width_m REAL NOT NULL,
                     height_m REAL,
+                    height_status TEXT DEFAULT 'AVAILABLE',
+                    height_reason TEXT,
                     orientation_deg REAL NOT NULL,
                     views INTEGER DEFAULT 1,
                     components_json TEXT,
@@ -70,6 +78,26 @@ class SurveyStore:
                     FOREIGN KEY (survey_id) REFERENCES surveys (survey_id)
                 )
             """)
+
+            # Migrations for existing database
+            for col, col_def in [
+                ("source_type", "TEXT DEFAULT 'REAL'"),
+                ("position_status", "TEXT DEFAULT 'AVAILABLE'"),
+                ("position_reason", "TEXT"),
+                ("r95_status", "TEXT DEFAULT 'AVAILABLE'"),
+                ("r95_reason", "TEXT"),
+                ("height_status", "TEXT DEFAULT 'AVAILABLE'"),
+                ("height_reason", "TEXT"),
+            ]:
+                try:
+                    cursor.execute(f"ALTER TABLE detections ADD COLUMN {col} {col_def}")
+                except sqlite3.OperationalError:
+                    pass  # column already exists
+
+            try:
+                cursor.execute("ALTER TABLE surveys ADD COLUMN source_type TEXT DEFAULT 'REAL'")
+            except sqlite3.OperationalError:
+                pass
 
             # Reviews table
             cursor.execute("""
@@ -90,6 +118,7 @@ class SurveyStore:
         survey_id: str,
         site_name: str,
         source_file: Optional[str] = None,
+        source_type: str = "REAL",
         swath_range_m: float = 60.0,
         altitude_m: float = 8.0,
     ) -> Dict[str, Any]:
@@ -97,15 +126,16 @@ class SurveyStore:
         with self._get_connection() as conn:
             conn.execute("""
                 INSERT OR REPLACE INTO surveys
-                (survey_id, site_name, source_file, created_at, swath_range_m, altitude_m)
-                VALUES (?, ?, ?, ?, ?, ?)
-            """, (survey_id, site_name, source_file, created_at, swath_range_m, altitude_m))
+                (survey_id, site_name, source_file, source_type, created_at, swath_range_m, altitude_m)
+                VALUES (?, ?, ?, ?, ?, ?, ?)
+            """, (survey_id, site_name, source_file, source_type, created_at, swath_range_m, altitude_m))
             conn.commit()
 
         return {
             "survey_id": survey_id,
             "site_name": site_name,
             "source_file": source_file,
+            "source_type": source_type,
             "created_at": created_at,
             "swath_range_m": swath_range_m,
             "altitude_m": altitude_m,
@@ -130,6 +160,13 @@ class SurveyStore:
         height_m: Optional[float] = None,
         orientation_deg: float = 0.0,
         views: int = 1,
+        source_type: str = "REAL",
+        position_status: str = "AVAILABLE",
+        position_reason: Optional[str] = None,
+        r95_status: str = "AVAILABLE",
+        r95_reason: Optional[str] = None,
+        height_status: str = "AVAILABLE",
+        height_reason: Optional[str] = None,
         components: Optional[Dict[str, Any]] = None,
         rules: Optional[List[Dict[str, Any]]] = None,
     ) -> Dict[str, Any]:
@@ -140,18 +177,20 @@ class SurveyStore:
         with self._get_connection() as conn:
             conn.execute("""
                 INSERT OR REPLACE INTO detections
-                (target_id, survey_id, class_name, hazard_confidence, status, priority,
-                 lat, lon, utm_easting, utm_northing, zone, r95_m, length_m, width_m,
-                 height_m, orientation_deg, views, components_json, rules_json, created_at)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                (target_id, survey_id, class_name, source_type, hazard_confidence, status, priority,
+                 lat, lon, utm_easting, utm_northing, zone, r95_m, position_status, position_reason,
+                 r95_status, r95_reason, length_m, width_m, height_m, height_status, height_reason,
+                 orientation_deg, views, components_json, rules_json, created_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """, (
-                target_id, survey_id, class_name, hazard_confidence, status, priority,
-                lat, lon, utm_easting, utm_northing, zone, r95_m, length_m, width_m,
-                height_m, orientation_deg, views, comp_str, rules_str, created_at,
+                target_id, survey_id, class_name, source_type, hazard_confidence, status, priority,
+                lat, lon, utm_easting, utm_northing, zone, r95_m, position_status, position_reason,
+                r95_status, r95_reason, length_m, width_m, height_m, height_status, height_reason,
+                orientation_deg, views, comp_str, rules_str, created_at,
             ))
             conn.commit()
 
-        return {"target_id": target_id, "status": "SAVED"}
+        return {"target_id": target_id, "status": "SAVED", "source_type": source_type}
 
     def record_operator_review(
         self,

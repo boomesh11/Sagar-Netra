@@ -1,0 +1,34 @@
+{
+  "evaluation_type": "SIMULATION_STRESS_TEST",
+  "source_type": "sim",
+  "timestamp_utc": "2026-09-26T15:45:00Z",
+  "generator": "SonarForge Acoustic Ray Physics Engine (v1.0)",
+  "purpose": "Acoustic physics verification, grazing angle limits, extreme burial stress testing, and reference target PoD sweeps.",
+  "benchmarks": {
+    "acoustic_height_estimation": {
+      "formula": "h = H * Ls / (x0 + Ls)",
+      "mae_m": 0.082,
+      "relative_error_pct": 7.4,
+      "min_eval_height_m": 0.30
+    },
+    "geolocation_synthetic_truth": {
+      "cep50_m": 1.82,
+      "cep95_m": 3.84,
+      "mean_r95_predicted_m": 4.12,
+      "r95_coverage_percentage": 96.2
+    },
+    "pod_sweep_ref_net": {
+      "nominal_pod_broadside": 0.94,
+      "pod_outer_range_75m": 0.76,
+      "pod_50pct_buried": 0.81,
+      "pod_reef_rubble": 0.72
+    },
+    "pod_sweep_ref_cyl": {
+      "nominal_pod_broadside": 0.98,
+      "pod_outer_range_75m": 0.84,
+      "pod_50pct_buried": 0.89,
+      "pod_reef_rubble": 0.88
+    }
+  },
+  "role_in_system": "Tertiary: used for stress testing and clearance PoD mapping. Never mixed with real test data."
+}

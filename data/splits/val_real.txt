@@ -1,0 +1,4 @@
+# Real validation tiles
+SCTD_REAL_025
+KLSG2_REAL_050
+GHOSTPOT_REAL_088

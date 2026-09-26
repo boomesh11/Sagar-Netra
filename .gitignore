@@ -14,11 +14,19 @@ venv/
 env/
 .env
 
-# Data (never commit raw data)
+# Data (never commit raw or large binary data)
 data/raw/
 data/interim/
+data/processed/
 data/datasets/
 data/demo_logs/
+data/real/indian/**/raw/
+artifacts/cache/
+!data/sources.yaml
+!data/dataset_manifest.json
+!data/splits/
+!data/licenses/
+!data/manifests/
 
 # Artifacts (generated)
 artifacts/models/*.pt

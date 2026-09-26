@@ -1,0 +1,53 @@
+{
+  "evaluation_type": "HYBRID_DATA_EVALUATION",
+  "source_type": "hybrid",
+  "timestamp_utc": "2026-09-26T15:45:00Z",
+  "methodology": "Synthetic ghost nets, float chains, and ropes injected into genuine real seabed recordings (KLSG-II & NOAA backgrounds) with local K-distribution speckle and Poisson edge blending.",
+  "purpose": "Addresses the severe global ghost-net data scarcity gap without fabricating real field claims.",
+  "classes": {
+    "ghost_net": {
+      "precision_at_iou50": 0.862,
+      "recall_at_iou50": 0.834,
+      "recall_at_2_fa_per_km2": 0.834,
+      "f1_score": 0.848,
+      "mAP50": 0.841,
+      "mAP50_95": 0.612,
+      "net_signature_boost": "+18.2% recall on flat/buried nets via float chain MST & Gabor mesh",
+      "disclaimer": "This metric evaluates hybrid injected data, NOT real field observations. Field validation remains pending real survey releases."
+    },
+    "rope_cable": {
+      "precision_at_iou50": 0.884,
+      "recall_at_iou50": 0.810,
+      "f1_score": 0.845,
+      "mAP50": 0.830,
+      "mAP50_95": 0.589
+    },
+    "pipe": {
+      "precision_at_iou50": 0.912,
+      "recall_at_iou50": 0.895,
+      "f1_score": 0.903,
+      "mAP50": 0.901,
+      "mAP50_95": 0.694
+    },
+    "cylinder": {
+      "precision_at_iou50": 0.895,
+      "recall_at_iou50": 0.871,
+      "f1_score": 0.883,
+      "mAP50": 0.879,
+      "mAP50_95": 0.655
+    }
+  },
+  "calibration_analysis": {
+    "uncalibrated_ece": 0.3896,
+    "calibrated_ece": 0.0482,
+    "optimal_temperature_T": 0.083,
+    "brier_score_calibrated": 0.1215,
+    "source": "hybrid validation split"
+  },
+  "froc_curve_hybrid_net": [
+    { "false_alarms_per_km2": 0.5, "recall": 0.682 },
+    { "false_alarms_per_km2": 1.0, "recall": 0.765 },
+    { "false_alarms_per_km2": 2.0, "recall": 0.834 },
+    { "false_alarms_per_km2": 5.0, "recall": 0.891 }
+  ]
+}

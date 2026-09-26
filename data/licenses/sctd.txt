@@ -1,0 +1,2 @@
+MIT License
+Side-scan Sonar Target Detection (SCTD 1.0) by Y-Rong et al.

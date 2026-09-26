@@ -1,0 +1,2 @@
+CC-BY-NC-4.0 License
+AI4Shipwrecks Benchmark (Deep Ocean Lab, Univ. of Michigan).

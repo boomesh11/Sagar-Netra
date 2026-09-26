@@ -1,0 +1,4 @@
+# Real held-out entire sites (AI4Shipwrecks wreck site 14 & 22)
+AI4WRECKS_SITE14_001
+AI4WRECKS_SITE14_002
+AI4WRECKS_SITE22_001

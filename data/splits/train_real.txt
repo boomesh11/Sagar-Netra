@@ -1,0 +1,6 @@
+# Real training tiles (grouped by survey site)
+SCTD_REAL_001
+SCTD_REAL_002
+KLSG2_REAL_010
+KLSG2_REAL_011
+GHOSTPOT_REAL_045

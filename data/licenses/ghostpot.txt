@@ -1,0 +1,2 @@
+GPL-3.0 License
+Ghost Pot Side-Scan Sonar Detection Dataset (PING Ecosystem / Univ. of Delaware).

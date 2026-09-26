@@ -1,0 +1,4 @@
+# Real test tiles (never overlapping with train)
+SCTD_REAL_090
+KLSG2_REAL_095
+SCTD2_REAL_012

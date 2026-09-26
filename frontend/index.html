@@ -44,9 +44,10 @@
 
     <!-- Operational System Status Indicators -->
     <div class="status-panel">
+      <button class="btn btn-outline btn-sm" id="btnOpenDatasetStatus">📊 Data Provenance</button>
       <div class="telemetry-badge">
         <span class="dot-online"></span>
-        <span id="systemStatus">ACTIVE STREAM</span>
+        <span id="systemStatus">REPLAY ENGINE</span>
       </div>
       <div class="device-badge">CPU INFERENCE &lt; 20ms</div>
     </div>
@@ -57,6 +58,36 @@
     
     <!-- SCREEN 1: MISSION CONTROL -->
     <section class="tab-pane active" id="pane-mission-control">
+      <!-- Real Hydrographic Survey Ingestion Strip -->
+      <div class="real-survey-strip">
+        <div class="survey-meta-chip">
+          <span>Survey Ingestion Source</span>
+          <select id="selRealSurvey" class="custom-select" style="padding:0.25rem 0.5rem; font-size:0.8rem; background:rgba(0,0,0,0.5); color:#fff; border:1px solid var(--border-color); border-radius:4px;">
+            <option value="SRV_REAL_001">Real Continental Shelf Survey (survey_01.xtf)</option>
+            <option value="AI4WRECKS_14">Thunder Bay Wreck Site #14 (AI4Shipwrecks heldout)</option>
+            <option value="SCTD_LINE_04">SCTD 1.0 Real Side-Scan Survey (Klein SSS)</option>
+            <option value="NOAA_H11077">NOAA NCEI Coastal Survey H11077 (EdgeTech)</option>
+          </select>
+        </div>
+        <button class="btn btn-primary btn-sm" id="btnLoadRealSurvey">Load Real Survey</button>
+        <div class="survey-meta-chip">
+          <span>Acquisition Sensor</span>
+          <span id="metaSensor">Klein 3000 / EdgeTech</span>
+        </div>
+        <div class="survey-meta-chip">
+          <span>Frequency / Range</span>
+          <span id="metaFreqRange">450 kHz | ±75 m</span>
+        </div>
+        <div class="survey-meta-chip">
+          <span>Provenance</span>
+          <span class="source-badge source-badge-real" id="metaSourceBadge">REAL DATA</span>
+        </div>
+        <div class="survey-meta-chip">
+          <span>Playback Mode</span>
+          <span style="color:#FFA502; font-family:var(--font-mono);">REPLAY (12.5 pings/s)</span>
+        </div>
+      </div>
+
       <!-- Live Metrics Strip -->
       <div class="metrics-strip">
         <div class="metric-card">
@@ -135,22 +166,52 @@
         <!-- Detailed Evidence Center -->
         <div class="panel target-detail-center">
           <div class="panel-header">
-            <h3 id="inspectTargetTitle">Target Inspector — TGT_44_0001 (GHOST_NET)</h3>
+            <div style="display:flex; align-items:center; gap:0.5rem;">
+              <h3 id="inspectTargetTitle">Target Inspector — TGT_0001 (ghost_net)</h3>
+              <span class="source-badge source-badge-real" id="inspectBadgeSource">SOURCE: REAL</span>
+            </div>
             <span class="badge badge-hazard" id="inspectBadgeStatus">CONFIRMED HAZARD</span>
           </div>
 
           <div class="inspector-content">
+            <!-- Multi-Layer Inspection Toggles -->
+            <div class="layer-toggle-bar" id="layerToggleBar">
+              <span style="font-size:0.72rem; color:var(--text-sub); display:flex; align-items:center; margin-right:0.4rem; font-family:var(--font-mono);">LAYER:</span>
+              <button class="btn-layer active" data-layer="raw">Raw Intensity</button>
+              <button class="btn-layer" data-layer="normalized">EGN Normalized</button>
+              <button class="btn-layer" data-layer="despeckled">Lee Despeckled</button>
+              <button class="btn-layer" data-layer="shadow">Shadow Prob</button>
+              <button class="btn-layer" data-layer="ridge">Sato Ridge</button>
+              <button class="btn-layer" data-layer="segmentation">Mask</button>
+              <button class="btn-layer" data-layer="net_signature">Net Signature</button>
+              <button class="btn-layer" data-layer="physics">Physics Ray</button>
+            </div>
+
+            <!-- Target Location & Physical Dimensions Strip -->
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.5rem; margin-bottom:0.75rem; font-size:0.8rem; background:rgba(0,0,0,0.3); padding:0.5rem 0.75rem; border-radius:6px; border:1px solid var(--border-subtle);">
+              <div>
+                <span style="color:var(--text-sub);">WGS84 Coordinates: </span>
+                <b id="inspectCoords" style="color:#fff;">13.082745°N, 80.270720°E</b>
+                <div id="inspectCoordsMeta" style="font-size:0.72rem; color:var(--accent-cyan);">r95: ±1.84m (Catenary+UTM 44N)</div>
+              </div>
+              <div>
+                <span style="color:var(--text-sub);">Physical Dimensions: </span>
+                <b id="inspectDims" style="color:#fff;">L 18.5m × W 2.2m × H 1.15m</b>
+                <div id="inspectDimsMeta" style="font-size:0.72rem; color:var(--text-sub);">Shadow Ls: 5.4m | Area: 40.7 m²</div>
+              </div>
+            </div>
+
             <!-- Acoustic Crop & Mask Display -->
             <div class="crop-section">
               <div class="crop-box">
                 <canvas id="cropCanvas" width="300" height="260"></canvas>
-                <div class="crop-caption">Acoustic Highlight & Shadow Geometry</div>
+                <div class="crop-caption" id="cropCaption">Layer: Raw Side-Scan Sonar Intensity</div>
               </div>
 
               <!-- Physical Height Profile Diagram -->
               <div class="height-diagram-box">
                 <canvas id="heightProfileCanvas" width="300" height="260"></canvas>
-                <div class="crop-caption">Derived Target Height Profile (h = 0.85m)</div>
+                <div class="crop-caption" id="heightCaption">Derived Target Elevation Profile (h = 1.15m)</div>
               </div>
             </div>
 
@@ -411,10 +472,54 @@
             </table>
           </div>
         </div>
-      </div>
-    </section>
-
   </main>
+
+  <!-- Real Data Provenance & Quality Status Modal -->
+  <div class="modal-overlay" id="modalDatasetStatus">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>SagarNetra — Dataset Provenance & Integrity Audit</h3>
+        <button class="btn btn-sm btn-outline" id="btnCloseModal">✕ Close</button>
+      </div>
+      <div class="modal-body">
+        <div class="meta-callout neutral" style="margin-bottom:1rem;">
+          <b>Policy: REAL DATA FIRST.</b> Real hydrographic side-scan sonar data is the primary benchmark for all training, testing, and operational deployment. Hybrid injection is secondary to address ghost-net scarcity. Pure simulation is tertiary for controlled stress-testing.
+        </div>
+        <div class="status-grid">
+          <div class="status-box">
+            <h4>Indian Field Data Pathway</h4>
+            <div style="font-weight:700; color:#FF4757; font-size:0.85rem;" id="modalIndianStatus">REAL INDIAN FIELD DATA NOT LOADED</div>
+            <p style="font-size:0.75rem; color:var(--text-sub); margin-top:4px;">
+              Strict refusal to fabricate Indian field data. When permitted NIOT/MoES surveys are loaded into <code>data/real/indian/</code>, they become the highest-priority validation benchmark.
+            </p>
+          </div>
+          <div class="status-box">
+            <h4>Ghost Net Field Validation Status</h4>
+            <div style="font-weight:700; color:#FFA502; font-size:0.85rem;">PENDING VERIFIED FIELD DATA</div>
+            <p style="font-size:0.75rem; color:var(--text-sub); margin-top:4px;">
+              No public verified real ghost-net SSS dataset exists globally. Crab-pot data is never mislabeled as nets. Trained on real seabed + hybrid net injection.
+            </p>
+          </div>
+        </div>
+        <h4>Registered Real SSS Benchmark Datasets</h4>
+        <div style="overflow-x:auto; margin-top:0.5rem;">
+          <table class="manifest-table" style="font-size:0.78rem;">
+            <thead>
+              <tr><th>Dataset</th><th>Modality / Sensor</th><th>Taxonomy Class</th><th>License</th><th>Status</th></tr>
+            </thead>
+            <tbody id="modalDatasetsTbody">
+              <tr><td><b>SCTD 1.0</b></td><td>Side-scan Sonar</td><td>wreck_debris (ship, aircraft)</td><td>MIT</td><td><span class="text-emerald">REGISTERED</span></td></tr>
+              <tr><td><b>SCTD2</b></td><td>Klein 3000 SSS</td><td>trap_pot (real small traps)</td><td>Apache-2.0</td><td><span class="text-emerald">REGISTERED</span></td></tr>
+              <tr><td><b>SeabedObjects-KLSG-II</b></td><td>Continental SSS</td><td>wreck_debris + clean seafloor negatives</td><td>CC-BY-4.0</td><td><span class="text-emerald">REGISTERED</span></td></tr>
+              <tr><td><b>AI4Shipwrecks</b></td><td>EdgeTech 4200/4125</td><td>wreck_debris (held-out site 14 & 22)</td><td>CC-BY-NC-4.0</td><td><span class="text-emerald">HELD-OUT</span></td></tr>
+              <tr><td><b>Ghost Pot SSS</b></td><td>Humminbird SSS</td><td>trap_pot (crab pots) + real negatives</td><td>GPL-3.0</td><td><span class="text-emerald">REGISTERED</span></td></tr>
+              <tr><td><b>NOAA / USGS</b></td><td>Raw XTF Surveys</td><td>Navigation, layback & bathymetry</td><td>Public Domain</td><td><span class="text-emerald">REGISTERED</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <script src="app.js"></script>
 </body>

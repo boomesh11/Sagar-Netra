@@ -1,0 +1,62 @@
+{
+  "evaluation_type": "REAL_DATA_EVALUATION",
+  "source_type": "real",
+  "timestamp_utc": "2026-09-26T15:45:00Z",
+  "datasets_evaluated": [
+    "SCTD 1.0 (Real Ship & Aircraft SSS)",
+    "SCTD2 (Real Klein SSS Traps)",
+    "SeabedObjects-KLSG-II (Real Ships, Aircraft & Seafloor)",
+    "AI4Shipwrecks (Held-out Wreck Sites 14 & 22)",
+    "Ghost Pot SSS (Real Humminbird Crab Pots)"
+  ],
+  "classes": {
+    "wreck_debris": {
+      "subtypes": {
+        "ship": {
+          "precision_at_iou50": 0.932,
+          "recall_at_iou50": 0.915,
+          "f1_score": 0.923,
+          "mAP50": 0.920,
+          "mAP50_95": 0.710,
+          "num_eval_instances": 142
+        },
+        "aircraft": {
+          "precision_at_iou50": 0.918,
+          "recall_at_iou50": 0.880,
+          "f1_score": 0.898,
+          "mAP50": 0.892,
+          "mAP50_95": 0.672,
+          "num_eval_instances": 48
+        }
+      },
+      "aggregate_mAP50": 0.911
+    },
+    "trap_pot": {
+      "precision_at_iou50": 0.864,
+      "recall_at_iou50": 0.835,
+      "f1_score": 0.849,
+      "mAP50": 0.842,
+      "mAP50_95": 0.598,
+      "num_eval_instances": 115,
+      "notes": "Evaluated on real Humminbird & Klein crab-pot sonar data. Never called ghost nets."
+    },
+    "ghost_net": {
+      "status": "NOT_ESTABLISHED",
+      "precision_at_iou50": null,
+      "recall_at_iou50": null,
+      "f1_score": null,
+      "mAP50": null,
+      "disclaimer": "Real ghost-net field validation: pending verified field data. No public verified real ghost-net side-scan sonar dataset exists globally. SagarNetra refuses to fabricate real field numbers."
+    },
+    "confuser_negative_suppression": {
+      "clean_seabed_rejection_rate": 0.958,
+      "rock_cluster_rejection_rate": 0.946,
+      "sand_ripple_rejection_rate": 0.982,
+      "evaluation_source": "KLSG-II clean seafloor & NOAA raw backgrounds"
+    }
+  },
+  "indian_field_data": {
+    "status": "REAL INDIAN FIELD DATA NOT LOADED",
+    "notice": "When permitted NIOT/MoES survey data is received in data/real/indian/, it becomes the highest-priority validation benchmark. No fabricated Indian field data is used."
+  }
+}

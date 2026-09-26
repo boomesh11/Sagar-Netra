@@ -1,0 +1,66 @@
+{
+  "manifest_version": "1.0.0",
+  "policy": "REAL_DATA_FIRST",
+  "primary_source": "real",
+  "secondary_source": "hybrid (ghost-net filling)",
+  "tertiary_source": "sim (controlled physics testing)",
+  "datasets": [
+    {
+      "id": "ghostpot",
+      "source_type": "real",
+      "class_mapped": "trap_pot",
+      "local_dir": "data/raw/ghostpot",
+      "status": "ready_for_ingestion",
+      "negatives_extracted": true
+    },
+    {
+      "id": "sctd",
+      "source_type": "real",
+      "class_mapped": "wreck_debris",
+      "subtypes": [
+        "ship",
+        "aircraft"
+      ],
+      "local_dir": "data/raw/sctd",
+      "status": "ready_for_ingestion"
+    },
+    {
+      "id": "sctd2",
+      "source_type": "real",
+      "class_mapped": "trap_pot",
+      "local_dir": "data/raw/sctd2",
+      "status": "ready_for_ingestion"
+    },
+    {
+      "id": "klsg2",
+      "source_type": "real",
+      "class_mapped": "wreck_debris",
+      "negatives_class": "confuser_negative",
+      "local_dir": "data/raw/klsg2",
+      "status": "ready_for_ingestion"
+    },
+    {
+      "id": "ai4shipwrecks",
+      "source_type": "real",
+      "class_mapped": "wreck_debris",
+      "subtype": "ship",
+      "local_dir": "data/raw/ai4shipwrecks",
+      "status": "held_out_benchmark"
+    },
+    {
+      "id": "indian_surveys",
+      "source_type": "real",
+      "local_dir": "data/real/indian",
+      "status": "REAL INDIAN FIELD DATA NOT LOADED",
+      "priority": "HIGHEST_WHEN_AVAILABLE"
+    },
+    {
+      "id": "hybrid_ghost_nets",
+      "source_type": "hybrid",
+      "class_mapped": "ghost_net",
+      "base_layer": "real_seabed_background",
+      "injected_component": "physics_simulated_net_drape",
+      "status": "active_hybrid_training"
+    }
+  ]
+}

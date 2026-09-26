@@ -20,9 +20,10 @@ def export_json(
     targets: List[Dict[str, Any]],
     survey_meta: Optional[Dict[str, Any]] = None,
 ) -> str:
-    """Exports full hierarchical survey and detection report as JSON string."""
+    """Exports full hierarchical survey and detection report as JSON string with provenance."""
     report_dict = {
         "report_type": "SagarNetra_Clearance_Work_Order",
+        "policy": "REAL_DATA_FIRST",
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "survey_metadata": survey_meta or {},
         "target_count": len(targets),
@@ -32,12 +33,13 @@ def export_json(
 
 
 def export_csv(targets: List[Dict[str, Any]]) -> str:
-    """Exports tabular dive-log summary as CSV string."""
+    """Exports tabular dive-log summary as CSV string with explicit source_type."""
     output = io.StringIO()
     fieldnames = [
-        "target_id", "class_name", "status", "priority", "hazard_confidence",
+        "target_id", "class_name", "status", "source_type", "priority", "hazard_confidence",
         "lat", "lon", "utm_easting", "utm_northing", "zone",
-        "r95_m", "search_box_side_m", "length_m", "width_m", "height_m",
+        "r95_m", "position_status", "r95_status", "search_box_side_m",
+        "length_m", "width_m", "height_m", "height_status",
         "orientation_deg", "views", "review_status"
     ]
     writer = csv.DictWriter(output, fieldnames=fieldnames, extrasaction="ignore")
@@ -45,8 +47,17 @@ def export_csv(targets: List[Dict[str, Any]]) -> str:
 
     for tgt in targets:
         row = dict(tgt)
-        r95 = float(tgt.get("r95_m", 3.0))
-        row["search_box_side_m"] = round(2.0 * r95, 2)
+        row["source_type"] = tgt.get("source_type", "REAL")
+        row["position_status"] = tgt.get("position_status", "AVAILABLE")
+        row["r95_status"] = tgt.get("r95_status", "AVAILABLE")
+        row["height_status"] = tgt.get("height_status", "AVAILABLE")
+
+        if tgt.get("r95_m") is not None:
+            r95 = float(tgt.get("r95_m", 3.0))
+            row["search_box_side_m"] = round(2.0 * r95, 2)
+        else:
+            row["search_box_side_m"] = "UNAVAILABLE"
+
         writer.writerow(row)
 
     return output.getvalue()
@@ -62,7 +73,7 @@ def export_geojson(
     for tgt in targets:
         lat = float(tgt["lat"])
         lon = float(tgt["lon"])
-        r95 = float(tgt.get("r95_m", 3.0))
+        r95 = float(tgt.get("r95_m", 3.0)) if tgt.get("r95_m") is not None else 3.0
         tid = tgt.get("target_id", "TGT")
 
         # 1. Point Feature (Target pin)
@@ -75,15 +86,20 @@ def export_geojson(
             "properties": {
                 "feature_type": "target_pin",
                 "target_id": tid,
+                "source_type": tgt.get("source_type", "REAL"),
                 "class_name": tgt.get("class_name"),
                 "status": tgt.get("status"),
                 "priority": tgt.get("priority"),
                 "confidence": tgt.get("hazard_confidence"),
                 "r95_m": r95,
-                "diver_search_box_m": round(2.0 * r95, 2),
+                "diver_search_box_m": round(2.0 * r95, 2) if r95 is not None else "UNAVAILABLE",
                 "length_m": tgt.get("length_m"),
                 "width_m": tgt.get("width_m"),
                 "height_m": tgt.get("height_m"),
+                "position_status": tgt.get("position_status", "AVAILABLE"),
+                "position_reason": tgt.get("position_reason"),
+                "height_status": tgt.get("height_status", "AVAILABLE"),
+                "height_reason": tgt.get("height_reason"),
                 "views": tgt.get("views", 1),
             }
         }
@@ -295,6 +311,7 @@ def export_pdf(
     table_headers = [
         Paragraph("<b>Rank</b>", table_cell),
         Paragraph("<b>Target ID</b>", table_cell),
+        Paragraph("<b>Source</b>", table_cell),
         Paragraph("<b>Class</b>", table_cell),
         Paragraph("<b>Status</b>", table_cell),
         Paragraph("<b>Conf</b>", table_cell),
@@ -309,26 +326,28 @@ def export_pdf(
     sorted_targets = sorted(targets, key=lambda x: x.get("priority", 0.0), reverse=True)
 
     for rank, tgt in enumerate(sorted_targets, 1):
-        r95 = float(tgt.get("r95_m", 3.0))
-        box_side = f"{2.0 * r95:.1f} m"
+        r95 = float(tgt.get("r95_m", 3.0)) if tgt.get("r95_m") is not None else 3.0
+        box_side = f"{2.0 * r95:.1f} m" if tgt.get("r95_m") is not None else "UNAVAIL"
         status_str = tgt.get("status", "CANDIDATE")
         status_color = "#E53E3E" if status_str == "CONFIRMED_HAZARD" else "#DD6B20"
+        src_str = tgt.get("source_type", "REAL")
 
         row = [
             Paragraph(f"<b>#{rank}</b>", table_cell),
             Paragraph(str(tgt.get("target_id", f"TGT_{rank:03d}")), table_cell),
+            Paragraph(f"<b>{src_str}</b>", table_cell),
             Paragraph(str(tgt.get("class_name", "hazard")), table_cell),
             Paragraph(f"<font color='{status_color}'><b>{status_str}</b></font>", table_cell),
             Paragraph(f"{tgt.get('hazard_confidence', 0):.1f}%", table_cell),
             Paragraph(f"<b>{tgt.get('priority', 0):.3f}</b>", table_cell),
-            Paragraph(f"{tgt.get('lat', 0.0):.5f}", table_cell),
-            Paragraph(f"{tgt.get('lon', 0.0):.5f}", table_cell),
-            Paragraph(f"±{r95:.1f}", table_cell),
+            Paragraph(f"{tgt.get('lat', 0.0):.5f}" if tgt.get("lat") is not None else "N/A", table_cell),
+            Paragraph(f"{tgt.get('lon', 0.0):.5f}" if tgt.get("lon") is not None else "N/A", table_cell),
+            Paragraph(f"±{r95:.1f}" if tgt.get("r95_m") is not None else "N/A", table_cell),
             Paragraph(box_side, table_cell),
         ]
         rows.append(row)
 
-    t_targets = Table(rows, colWidths=[30, 60, 65, 95, 40, 45, 55, 55, 45, 50])
+    t_targets = Table(rows, colWidths=[28, 52, 45, 60, 85, 38, 42, 50, 50, 42, 48])
     t_targets.setStyle(TableStyle([
         ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#0A2540")),
         ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
