@@ -1,70 +1,7 @@
 {
-  "system": "SagarNetra — Real-Data-First Prototype",
-  "version": "1.1.0",
-  "policy": "REAL_DATA_FIRST",
-  "timestamp_utc": "2026-09-26T15:45:00Z",
-  "provenance_summary": {
-    "real_data": {
-      "role": "PRIMARY",
-      "wrecks_mAP50": 0.911,
-      "traps_mAP50": 0.842,
-      "ghost_net_status": "NOT ESTABLISHED (pending verified real field data)",
-      "indian_data_status": "REAL INDIAN FIELD DATA NOT LOADED (strictly no fabrication)"
-    },
-    "hybrid_data": {
-      "role": "SECONDARY (ghost-net scarcity gap resolution)",
-      "ghost_net_recall_at_2fa": 0.834,
-      "ghost_net_mAP50": 0.841,
-      "calibrated_ece": 0.0482
-    },
-    "sim_data": {
-      "role": "TERTIARY (SonarForge physics stress-testing & PoD tables)",
-      "height_mae_m": 0.082,
-      "cep95_m": 3.84
-    }
-  },
-  "source_distribution_table": [
-    {
-      "class_name": "ghost_net",
-      "real_status": "NOT ESTABLISHED",
-      "hybrid_mAP50": 0.841,
-      "sim_pod_broadside": 0.94,
-      "active_training_source": "hybrid"
-    },
-    {
-      "class_name": "wreck_debris",
-      "real_status": "0.911 (SCTD/KLSG-II/AI4Shipwrecks)",
-      "hybrid_mAP50": 0.931,
-      "sim_pod_broadside": 0.98,
-      "active_training_source": "real + hybrid"
-    },
-    {
-      "class_name": "trap_pot",
-      "real_status": "0.842 (Ghost Pot & SCTD2)",
-      "hybrid_mAP50": 0.848,
-      "sim_pod_broadside": 0.95,
-      "active_training_source": "real"
-    },
-    {
-      "class_name": "rope_cable",
-      "real_status": "PENDING FIELD RELEASES",
-      "hybrid_mAP50": 0.830,
-      "sim_pod_broadside": 0.91,
-      "active_training_source": "hybrid"
-    },
-    {
-      "class_name": "pipe",
-      "real_status": "PENDING FIELD RELEASES",
-      "hybrid_mAP50": 0.901,
-      "sim_pod_broadside": 0.96,
-      "active_training_source": "hybrid"
-    },
-    {
-      "class_name": "cylinder",
-      "real_status": "PENDING FIELD RELEASES",
-      "hybrid_mAP50": 0.879,
-      "sim_pod_broadside": 0.95,
-      "active_training_source": "hybrid"
-    }
-  ]
+  "system": "SagarNetra",
+  "status": "PENDING_BENCHMARK",
+  "metrics": {
+    "mAP50": "PENDING_BENCHMARK"
+  }
 }

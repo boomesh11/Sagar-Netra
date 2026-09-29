@@ -39,22 +39,22 @@
 ## 2. Performance & Calibration
 
 ### Core Metrics on Test Split
-- **mAP50 (Hazard Classes):** 0.841
-- **Ghost Net Recall:** 83.4% at $\le 2$ false alarms/km²
-- **Uncalibrated ECE:** 38.96%
-- **Calibrated ECE ($T = 0.083$):** 4.82%
-- **Brier Score (Calibrated):** 0.1215
+- **mAP50 (Hazard Classes):** PENDING_BENCHMARK (Evaluation run pending official benchmark)
+- **Ghost Net Recall:** PENDING_BENCHMARK (Field validation strictly NOT_ESTABLISHED pending verified real data)
+- **Uncalibrated ECE:** PENDING_BENCHMARK
+- **Calibrated ECE:** PENDING_BENCHMARK
+- **Brier Score (Calibrated):** PENDING_BENCHMARK
 
 ### Inference Latency
-- **Laptop CPU (Intel Core i7, 1 thread):** 16.3 ms (Neural inference only) / 88.5 ms (Full end-to-end pipeline).
-- **Edge GPU (Jetson Orin simulated):** 14.2 ms full pipeline.
+- **Laptop CPU (Intel Core i7, 1 thread):** Target: < 50 ms (pending field benchmark)
+- **Edge GPU (Jetson Orin simulated):** Target: < 15 ms (pending field benchmark)
 
 ---
 
 ## 3. Training & Validation Data
 
-- **Dataset:** `SagarNetra-SSS-IN v1`
-- **Total Training Tiles:** 20,000 synthetic + 15,000 hybrid injected tiles across 5 Indian shelf seabed presets.
+- **Dataset:** `AI4Shipwrecks (NOAA EdgeTech 2205 SSS)` + registered open acoustic sets
+- **Evaluation Split:** Held-out survey sites with strict survey/site isolation (zero spatial overlap)
 - **Augmentation Constraints:** 
   - *Allowed:* Port/starboard mirror across nadir, along-track jitter, speckle re-sampling.
   - *Forbidden:* 90°/180° rotations or vertical flips (violates sonar grazing geometry and acoustic shadow orientation).

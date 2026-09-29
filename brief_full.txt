@@ -1,0 +1,268 @@
+<USER_REQUEST>
+You are working on SagarNetra (d:\SIHPS2), an SIH 2026 prototype for PS 26057
+(NIOT/MoES): AI-powered underwater debris detection in side-scan sonar (SSS).
+Read this entire brief before doing anything. Then execute ONLY the phase I
+name, stop at its gate, and report.
+
+=====================================================================
+GROUND RULES (apply to every phase — violating any of these = failure)
+=====================================================================
+1. EVIDENCE, NOT CLAIMS. Never mark anything "working" unless you ran it.
+   For every claim, paste the exact command you ran and its real output
+   (trimmed if long). "Written" ≠ "working".
+2. NO FAKE OUTPUTS. No hardcoded detections, classes, confidences,
+   coordinates, metrics, or heuristic stand-ins presented as model output.
+   If something isn't available, return null / "UNAVAILABLE" /
+   "PENDING_BENCHMARK" and say so in the UI.
+3. ONE ENGINE. Python (backend/sagarnetra) is the single source of truth
+   for all analysis. The Next.js app only uploads files and displays
+   results. Do not add new analysis logic in TypeScript.
+4. NO SCOPE CREEP. Do not touch WebSocket streaming, change detection,
+   or coverage grid until I explicitly unfreeze them. Do not add
+   new features that are not in the current phase.
+5. NO TUNING TO TEST IMAGES. Never add rules, thresholds, or special cases
+   that key on a specific test image, filename, folder, or image size.
+   Inference must never read filenames or labels.
+6. Windows environment (PowerShell). Give commands that work there.
+   Pin dependencies in backend/requirements.txt.
+7. If something is blocked (missing data, missing GPU, broken library),
+   STOP and tell me exactly what you need. Do not simulate around it.
+8. At the end of each phase output: (a) what changed (files),
+   (b) commands run + real output, (c) gate checklist with PASS/FAIL,
+   (d) known issues. Nothing else.
+
+=====================================================================
+TARGET CLASSES (aligned to the problem statement)
+=====================================================================
+Trained known classes: wreck, pipe_cylinder, net_debris, other_manmade
+Decision outputs: <known class> | unknown_manmade | natural_suppressed
+                  | uncertain | invalid_input
+Bicycle, ladder, cage etc. are NOT trained classes. They are held-out
+open-set test objects that should route to unknown_manmade (or
+other_manmade) — never net_debris.
+
+=====================================================================
+PHASE 0 — HONEST AUDIT & CLEANUP
+=====================================================================
+Tasks:
+a. Create a Python venv, install backend requirements, and run:
+   - an import smoke test that imports every module in backend/sagarnetra
+     and sonarforge; list every import error.
+   - pytest on all existing Python tests; report pass/fail per test.
+b. Grep the whole repo (TS and Python) for fabricated or heuristic stand-ins:
+   hardcoded class rules (e.g. `boxW >= 220 → wreck_debris`), hardcoded
+   lat/lon, hardcoded confidences, seeded "raw YOLO" values, rules keyed
+   to image size/filename. List each with file:line.
+c. Remove or quarantine them:
+   - Fake detector heuristics: delete.
+   - Demo surveys in lib/engine/inference.ts: keep ONLY if every demo is
+     visibly labelled "DEMO — SYNTHETIC DATA" in the UI and in exports,
+     and coordinates in demos come from a synthetic nav file, not literals.
+d. Write STATUS.md with a truthful table: module | exists | imports |
+   tested | wired to UI. No emojis, no marketing.
+GATE: import errors = 0, pytest results reported honestly, fabrication
+list resolved, STATUS.md written.
+
+=====================================================================
+PHASE 1 — PYTHON PIPELINE RUNS STANDALONE (no UI, no YOLO yet)
+=====================================================================
+Tasks:
+a. Create scripts/run_pipeline.py:
+   python scripts/run_pipeline.py --image <path> [--nav <csv>] --out <dir>
+   Pipeline: load → modality check (SSS vs optical) → preprocessing
+   (column/TVG normalization, Lee despeckle, nadir detection, data-quality
+   mask from image: row energy drop + ping-to-ping correlation) →
+   OS-CFAR candidates with highlight/shadow pairing → EchoSift verification
+   → decision → JSON report.
+b. Move the modality check logic from lib/sonar-detector.ts into Python.
+c. Output JSON per detection: id, bbox_px, class, confidence (0-100),
+   decision, decision_reason, evidence{...each term...},
+   height_m (null if no altitude), dims (px always; metres only if
+   resolution known), geo{status, lat, lon, utm} (UNAVAILABLE without nav),
+   quality_overlap_pct, raw_candidate_source.
+d. Save an overlay PNG (boxes, class, confidence) next to the JSON.
+e. Run it on every image in tests/fixtures/ and show a summary table.
+GATE: script runs on all fixture images without crashing; JSON validates
+against a pydantic schema; no coordinates appear for image-only input;
+overlay images saved. Report detection counts honestly even if bad.
+
+=====================================================================
+PHASE 2 — WIRE UI TO BACKEND (single engine)
+=====================================================================
+Tasks:
+a. FastAPI endpoints (keep minimal): GET /api/health, POST /api/analyze
+   (multipart: image + optional nav CSV), GET /api/surveys,
+   GET /api/surveys/{id}, GET /api/surveys/{id}/detections,
+   GET /api/surveys/{id}/export?format=json|csv|geojson|kml.
+   /api/analyze calls the exact same function as scripts/run_pipeline.py.
+b. Next.js: NEXT_PUBLIC_API_URL env var; lib/api.ts uses fetch() to the
+   backend. Remove the TypeScript analysis path from the upload flow
+   (keep TS code only for rendering). If backend is down, show
+   "Analysis backend offline" — never fall back to fake results.
+c. Uploaded surveys appear in Surveys, Analysis, Map (only if nav present),
+   and Reports. Exports come from the backend, not static data.
+d. Add start.ps1 (and docker-compose.yml) that launches backend :8000
+   and frontend :3000 together.
+e. Map: replace SVG pin map with Leaflet + OpenStreetMap if not already;
+   show only surveys with real/synthetic nav, labelled accordingly.
+GATE: fresh clone → start.ps1 → upload a fixture image in the browser →
+detections render from backend → download JSON/CSV that match the
+backend response. Show network request/response evidence.
+
+=====================================================================
+PHASE 3 — DATA
+=====================================================================
+Tasks:
+a. Write converters for whatever real datasets exist under data/real/
+   (e.g. AI4Shipwrecks, SCTD, SeabedObjects-KLSG) into one YOLO-format
+   dataset with our class map. Unmappable classes → other_manmade or
+   dropped (document the mapping in data/CLASS_MAP.md). Record source,
+   licence, counts in data/PROVENANCE.json.
+b. Run SonarForge for a SMALL batch first (50 scenes). Generate a contact
+   sheet PNG of 25 samples with labels drawn, and a side-by-side with real
+   SSS tiles. STOP and show me the contact sheet before generating more —
+   I will judge realism.
+c. After my approval: generate 1000–3000 scenes for pipe_cylinder,
+   net_debris, other_manmade (and some wreck). Generate bicycle/ladder/
+   cage scenes ONLY into a separate open-set test folder, never training.
+d. Build a hard-negative set: natural seabed tiles (sand ripples, rocks,
+   sediment, motion stripes, nadir) with empty labels.
+e. Splits: train/val from real+synthetic; TEST = real images only,
+   never seen in training. Print per-class counts per split.
+GATE: dataset YAML valid, counts printed, contact sheets saved, real test
+set exists and is disjoint from train.
+
+=====================================================================
+PHASE 4 — TRAIN THE DETECTOR
+=====================================================================
+Tasks:
+a. Fine-tune YOLOv8n (seg if polygon labels exist, else detect) from
+   yolov8n weights on the Phase 3 dataset. Use sonar-appropriate
+   augmentation (no hue/colour jitter; grayscale; flips along-track;
+   speckle; brightness/gain; small scale changes).
+b. Report on the REAL test set only: precision, recall, mAP50, mAP50-95,
+   per-class, confusion matrix. Also report false positives per image on
+   the hard-negative set. Report numbers exactly as measured, even if poor.
+c. Export to ONNX; load via backend/sagarnetra/detect/yolo_onnx.py;
+   candidates in the pipeline = union of YOLO + OS-CFAR, deduplicated,
+   each tagged with its source.
+d. Save model card: data used, classes, metrics, limitations, date.
+GATE: ONNX model loads in the backend; /api/analyze now returns real
+detector scores; metrics file saved; model card written.
+
+=====================================================================
+PHASE 5 — SEABED-NORMALITY ANOMALY BRANCH
+=====================================================================
+Tasks:
+a. Inspect backend/sagarnetra/detect/anomaly.py and replace it with a
+   PatchCore-style model (pretrained CNN features, memory bank built ONLY
+   from natural seabed tiles: sand, ripples, rocks, sediment).
+b. Output a per-pixel anomaly heatmap and a per-candidate anomaly score.
+c. Evaluate: anomaly score distribution on man-made vs natural test tiles
+   (AUROC). Report honestly.
+GATE: heatmap renders in the UI as a toggleable layer; AUROC reported.
+
+=====================================================================
+PHASE 6 — VERIFICATION, FUSION, DECISION
+=====================================================================
+Tasks:
+a. Evidence per candidate (keep it to these, each in [0,1] with a short
+   text reason): detector_score (per class), anomaly_score,
+   seabed_context_contrast (candidate vs surrounding annulus: FFT/Gabor
+   texture similarity), shadow_validity (highlight-shadow pair, correct
+   side of nadir, unitless in image-only mode), height_plausibility
+   (only when altitude known, else null), quality_overlap_penalty,
+   structural_group_score (from merging fragments sharing a shadow
+   envelope / proximity; thresholds configurable).
+b. Net evidence must be based on: amorphous textured patch, thin
+   rope-like curvilinear ridges, low relief, entanglement with other
+   returns. Mesh periodicity is an optional cue only. Height must never
+   decide net_debris on its own. Size must never decide wreck on its own.
+   Aspect ratio must never decide pipe on its own.
+c. Fusion: logistic regression (or small gradient-boosted model) trained on
+   the validation split's evidence vectors; if validation data is too
+   small, use transparent fixed weights and label "calibration: PENDING".
+   If calibrated, report ECE and Brier on test. Never show raw detector
+   score as final confidence.
+d. Decision logic:
+   - natural_suppressed if context contrast low AND anomaly low
+   - known class if fused class confidence >= threshold
+   - unknown_manmade if anomaly/anthropogenic high but no known class
+     passes threshold
+   - uncertain otherwise; invalid_input from modality check
+   - quality overlap above a configurable limit → penalize or suppress
+   Every decision emits a plain-English decision_reason built from the
+   actual evidence values.
+e. UI: Raw vs Verified toggle showing "N candidates → M verified,
+   K suppressed", and an evidence panel listing each term.
+GATE: decision logic unit-tested with synthetic evidence vectors; UI
+toggle works on a real upload.
+
+=====================================================================
+PHASE 7 — NAVIGATION, XTF, GEOTAGGING
+=====================================================================
+Tasks:
+a. Nav CSV sidecar: time/lat/lon/heading/altitude(optional)/speed columns;
+   validate with pydantic; map ping rows → nav by time or row index.
+b. Geotag: pixel → slant range → ground range (if altitude) → offset
+   perpendicular to heading (port/starboard) → layback correction →
+   WGS84 → auto UTM zone (pyproj). r95 only if error budget inputs exist,
+   else null.
+c. XTF: implement a real reader (e.g. pyxtf) for sonar channels +
+   navigation; test on a real sample XTF file (tell me if you need one).
+   Leave JSF as clearly marked "not supported" if no sample exists.
+d. Test with SonarForge synthetic nav where true object positions are
+   known; report position error in metres.
+GATE: uploaded image + nav CSV shows correct pins on Leaflet map;
+XTF sample parses; position error reported.
+
+=====================================================================
+PHASE 8 — REAL REGRESSION & BLIND TESTS
+=====================================================================
+Tasks:
+a. Rewrite tests to run against the Python pipeline on real fixture
+   images (not seeded demo data). Required tests:
+   - bicycle image: final class != net_debris (expect unknown_manmade
+     or other_manmade)
+   - sand-ripple images: 0 verified detections (or below a stated limit)
+   - motion-artefact image: candidates penalized/suppressed
+   - image-only input: geo.status == UNAVAILABLE, lat/lon null
+   - optical photo: invalid_input
+   - open-set folder (bicycle/ladder/cage synthetic): % routed to
+     unknown_manmade/other_manmade; % wrongly routed to net_debris
+b. Blind protocol: inference never sees filenames/labels; ground truth is
+   compared after prediction.
+c. Metrics report: per-class P/R, FP per image on hard negatives,
+   net false-assignment rate, unknown routing accuracy, fragments per
+   object. Save to reports/metrics.json and show in the System view.
+GATE: pytest green or failures honestly listed; metrics.json saved.
+
+=====================================================================
+PHASE 9 — EDGE PROFILE
+=====================================================================
+Tasks: measure ONNX Runtime inference time per 640px tile on this
+machine (CPU, and GPU if available) and full-pipeline time per image.
+Display measured numbers in the System view. Jetson/INT8 stays labelled
+"Target — pending benchmark" unless actually run on the device.
+GATE: timing table with real measurements.
+
+=====================================================================
+FROZEN (do not work on unless I unfreeze)
+=====================================================================
+WebSocket streaming, change detection, coverage grid, PDF work orders,
+multi-pass persistence, analyst feedback loop. In the UI, either hide
+these views or label them "Experimental — not connected".
+
+Start now with PHASE 0 only.
+</USER_REQUEST>
+<ADDITIONAL_METADATA>
+The current local time is: 2026-09-27T09:18:04+05:30.
+
+The user's current state is as follows:
+Other open documents:
+- d:\SIHPS2\backend\sagarnetra\geo\error_budget.py (LANGUAGE_PYTHON)
+- d:\SIHPS2\training\export_onnx.py (LANGUAGE_PYTHON)
+- d:\SIHPS2\training\train_yolo.py (LANGUAGE_PYTHON)
+- d:\SIHPS2\backend\sagarnetra\detect\fuse_candidates.py (LANGUAGE_PYTHON)
+- d:\SIHPS2\backend\sagarnetra\preprocess\despeckle.py (LANGUAGE_PYTHON)
+</ADDITIONAL_METADATA>

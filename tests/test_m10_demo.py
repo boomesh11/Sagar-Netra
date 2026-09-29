@@ -77,7 +77,7 @@ def test_demo_script_scenarios():
 
 
 def test_final_evaluation_metrics_artifact():
-    """Verify final evaluation metrics artifact structure and target achievements."""
+    """Verify final evaluation metrics artifact structure and honest PENDING_BENCHMARK status."""
     root_dir = Path(__file__).resolve().parent.parent
     metrics_path = root_dir / "artifacts" / "metrics" / "final_evaluation_metrics.json"
 
@@ -85,47 +85,21 @@ def test_final_evaluation_metrics_artifact():
     data = json.loads(metrics_path.read_text(encoding="utf-8"))
 
     assert data.get("system") == "SagarNetra"
-    assert "targets_vs_measured" in data
-    assert len(data["targets_vs_measured"]) >= 5
-
-    # Check key targets
-    targets_map = {item["metric"]: item["status"] for item in data["targets_vs_measured"]}
-    assert "Ghost Net Recall @ <= 2 FA/km²" in targets_map
-    assert targets_map["Ghost Net Recall @ <= 2 FA/km²"] == "ACHIEVED"
-    assert "Expected Calibration Error (ECE)" in targets_map
-    assert targets_map["Expected Calibration Error (ECE)"] == "ACHIEVED"
-    assert "Geotagging Error CEP95" in targets_map
-    assert targets_map["Geotagging Error CEP95"] == "ACHIEVED"
-
-    # Check class performance
-    assert "class_performance" in data
-    assert "ghost_net" in data["class_performance"]
-    assert data["class_performance"]["ghost_net"]["recall_at_iou50"] >= 0.80
-
-    # Check calibration numbers
-    assert "calibration_analysis" in data
-    assert data["calibration_analysis"]["calibrated_ece"] <= 0.05
+    assert data.get("status") == "PENDING_BENCHMARK"
+    assert "metrics" in data
+    assert data["metrics"]["mAP50"] == "PENDING_BENCHMARK"
 
 
 def test_ablation_study_artifact():
-    """Verify ablation study progression from A0 to A5."""
+    """Verify ablation study artifact structure and honest PENDING_BENCHMARK status."""
     root_dir = Path(__file__).resolve().parent.parent
     ablation_path = root_dir / "artifacts" / "metrics" / "ablation_study.json"
 
     assert ablation_path.exists(), "ablation_study.json must exist"
     data = json.loads(ablation_path.read_text(encoding="utf-8"))
 
-    assert "stages" in data
-    assert len(data["stages"]) == 6  # A0 through A5
-
-    # Ensure recall increases as specialized modules are added
-    recalls = [s["ghost_net_recall"] for s in data["stages"]]
-    assert recalls[-1] > recalls[0], "Full pipeline recall must exceed baseline YOLO"
-
-    # Ensure false alarms per km2 decrease with physics verification
-    fa_baseline = data["stages"][0]["false_alarms_per_km2"]
-    fa_physics = data["stages"][3]["false_alarms_per_km2"]
-    assert fa_physics < fa_baseline, "Physics verification must reduce false alarms"
+    assert data.get("system") == "SagarNetra"
+    assert data.get("status") == "PENDING_BENCHMARK"
 
 
 def test_documentation_suite_integrity():

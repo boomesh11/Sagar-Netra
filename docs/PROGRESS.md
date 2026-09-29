@@ -175,11 +175,11 @@
 - Mounted static dashboard directly at `/` via FastAPI `StaticFiles`.
 - `DEMO_SCRIPT.md`: Step-by-step judge presentation script containing all 6 evaluation scenarios (Chennai Port, Gulf of Mannar, Kochi, Interference Veto, Visakhapatnam Post-Cyclone, SonarForge Lab) and highlighting the 10 core technical differentiators against traditional computer vision approaches.
 - `artifacts/metrics/final_evaluation_metrics.json`: Final consolidated system metrics artifact verifying target vs. measured prototype achievements:
-  - Ghost Net Recall @ $\le 2\text{ FA/km}^2$: Target $\ge 80.0\%$ | Measured **83.4%** (Achieved)
-  - Calibrated ECE: Target $\le 0.050$ | Measured **0.048 (4.8%)** (Achieved)
-  - Geotagging Error CEP95: Target $\le 5.0\text{ m}$ | Measured **3.84 m** (Achieved)
-  - Acoustic Height MAE ($h > 0.3\text{ m}$): Target $\le 0.15\text{ m}$ | Measured **0.082 m** (Achieved)
-  - Inference Latency: Target $\le 150\text{ ms}$ | Measured **88.5 ms** (CPU) / **14.2 ms** (Jetson Orin sim) (Achieved)
+  - Ghost Net Recall @ $\le 2\text{ FA/km}^2$: Target $\ge 80.0\%$ | Status **PENDING_BENCHMARK** (Evaluation pending official benchmark)
+  - Calibrated ECE: Target $\le 0.050$ | Status **PENDING_BENCHMARK**
+  - Geotagging Error CEP95: Target $\le 5.0\text{ m}$ | Status **PENDING_BENCHMARK**
+  - Acoustic Height MAE ($h > 0.3\text{ m}$): Target $\le 0.15\text{ m}$ | Status **PENDING_BENCHMARK**
+  - Inference Latency: Target $\le 150\text{ ms}$ | Status **PENDING_BENCHMARK**
 - `artifacts/metrics/ablation_study.json`: Progressive component ablation table verifying incremental improvements from baseline single-channel YOLO through full physics-grounded SagarNetra.
 - Core Documentation Suite:
   - `docs/ARCHITECTURE.md`: Complete subsystem architecture and Mermaid dataflow diagram.
@@ -209,7 +209,7 @@
   - Download suite (`scripts/download/`): Non-crashing downloaders for all public datasets with checksum verification.
 - **Metric Separation & Honest Field Validation**:
   - `artifacts/metrics/real_metrics.json`: Evaluates real wreck debris and trap pots on real held-out data; marks ghost net recall as `"NOT_ESTABLISHED"` (pending verified field data).
-  - `artifacts/metrics/hybrid_metrics.json`: Documents hybrid ghost net recall (83.4% @ 2 FA/km², 4.8% ECE).
+  - `artifacts/metrics/hybrid_metrics.json`: Pending official benchmark run on full held-out splits.
   - `artifacts/metrics/sim_metrics.json`: Controlled SonarForge simulation test bench.
   - `artifacts/metrics/summary_metrics.json`: Consolidated multi-source dashboard.
 - **Backend & Database Upgrades**:

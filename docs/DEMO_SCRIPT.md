@@ -92,7 +92,7 @@
        2. Euclidean Minimum Spanning Tree (MST) proving periodic spacing ($CV < 0.25$).
        3. Gabor filter bank isolating regular diamond mesh backscatter.
   5. Show performance metrics transparency:
-     - Ghost-net recall on Hybrid Benchmark: **83.4% @ 2 FA/km²**.
+     - Ghost-net recall on Hybrid Benchmark: **Pending benchmark** (Target: >= 80% @ 2 FA/km²).
      - Real field validation status: **Pending verified field data** (strictly adhering to scientific honesty).
 
 ---

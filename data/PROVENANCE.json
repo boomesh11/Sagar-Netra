@@ -1,0 +1,48 @@
+{
+  "system": "SagarNetra — Underwater Debris Intelligence",
+  "policy": "REAL_DATA_FIRST",
+  "generated_at": "2026-09-27T11:00:00Z",
+  "datasets": [
+    {
+      "name": "AI4Shipwrecks",
+      "provider": "NOAA Thunder Bay National Marine Sanctuary / EdgeTech 2205 SSS",
+      "modality": "Dual-frequency side-scan sonar backscatter (410/120 kHz)",
+      "license": "CC-BY-NC-4.0",
+      "access": "Public Research",
+      "target_classes": ["wreck"],
+      "splits": {
+        "train": 1643,
+        "val": 280,
+        "test": 358
+      },
+      "isolation_policy": "Strict site-level isolation. Held-out vessel sites (Oscar T. Flint, Pewabic, W.P. Rend, Montana) never seen in training."
+    },
+    {
+      "name": "Ghost Pot SSS",
+      "provider": "University of Delaware / Humminbird SSS",
+      "modality": "Single-beam high-frequency side-scan sonar",
+      "license": "GPL-3.0",
+      "access": "Public Authorised",
+      "target_classes": ["other_manmade"],
+      "notes": "Derelict crab pots and wire cages mapped to other_manmade. Never labelled as ghost net."
+    },
+    {
+      "name": "SCTD 1.0 & SCTD2",
+      "provider": "SCTD Authors / Klein 3000 Sonar",
+      "modality": "High-resolution side-scan sonar",
+      "license": "MIT / Apache-2.0",
+      "access": "Public",
+      "target_classes": ["wreck", "other_manmade"],
+      "notes": "Vessel hulls, aircraft, and traps."
+    },
+    {
+      "name": "SonarForge Synthetic & Hard Negatives",
+      "provider": "SagarNetra SonarForge Physics Engine",
+      "modality": "Ray-traced acoustic backscatter with K-distribution speckle",
+      "license": "Proprietary / In-house SIH 2026",
+      "access": "Internal",
+      "target_classes": ["net_debris", "pipe_cylinder", "other_manmade", "natural_suppressed"],
+      "hard_negatives": "Natural sand ripples, rocky shoals, sediment boundaries, nadir blind-zone artifacts"
+    }
+  ]
+}

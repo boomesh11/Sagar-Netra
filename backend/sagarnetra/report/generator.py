@@ -71,6 +71,8 @@ def export_geojson(
     features = []
 
     for tgt in targets:
+        if tgt.get("lat") is None or tgt.get("lon") is None:
+            continue
         lat = float(tgt["lat"])
         lon = float(tgt["lon"])
         r95 = float(tgt.get("r95_m", 3.0)) if tgt.get("r95_m") is not None else 3.0
@@ -172,13 +174,15 @@ def export_kml(targets: List[Dict[str, Any]]) -> str:
     ]
 
     for tgt in targets:
+        if tgt.get("lat") is None or tgt.get("lon") is None:
+            continue
         lat = tgt["lat"]
         lon = tgt["lon"]
         tid = tgt.get("target_id", "TGT")
         cls_name = tgt.get("class_name", "debris")
         conf = tgt.get("hazard_confidence", 0.0)
         prio = tgt.get("priority", 0.0)
-        r95 = tgt.get("r95_m", 3.0)
+        r95 = tgt.get("r95_m", 3.0) or 3.0
 
         style_id = "hazardConfirmed" if tgt.get("status") == "CONFIRMED_HAZARD" else "hazardSuspected"
         desc = (

@@ -10,16 +10,19 @@ services:
     volumes:
       - ./data:/app/data
       - ./artifacts:/app/artifacts
+      - ./reports:/app/reports
     environment:
-      - HF_TOKEN=${HF_TOKEN:-}
+      - PYTHONPATH=/app
     restart: unless-stopped
 
   frontend:
     build:
-      context: ./frontend
+      context: .
       dockerfile: Dockerfile.frontend
     ports:
-      - "5173:5173"
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:8000
     depends_on:
       - backend
     restart: unless-stopped

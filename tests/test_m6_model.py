@@ -8,6 +8,7 @@ Unit and integration tests for Milestone 6:
 """
 from pathlib import Path
 import numpy as np
+from PIL import Image
 import pytest
 import torch
 
@@ -106,19 +107,29 @@ def test_torchscript_export_and_parity(tmp_path: Path):
     assert report["torchscript_cls_parity_max_diff"] < 1e-3
 
 
-def test_sonar_seg_dataset_loader():
-    """Validates SonarSegDataset loading from sagarnetra_v1."""
-    train_dir = Path("data/datasets/sagarnetra_v1/train")
-    if not train_dir.exists():
-        pytest.skip("sagarnetra_v1 train dataset not found")
+def test_sonar_seg_dataset_loader(tmp_path: Path):
+    """Validates SonarSegDataset loading using temporary synthetic dataset directory."""
+    img_dir = tmp_path / "images"
+    lbl_dir = tmp_path / "labels"
+    img_dir.mkdir(parents=True)
+    lbl_dir.mkdir(parents=True)
 
-    ds = SonarSegDataset(train_dir, img_size=512, max_samples=3)
-    assert len(ds) > 0
+    # Create dummy 512x512 3-channel test PNG
+    test_img = Image.fromarray(np.random.randint(0, 255, (512, 512, 3), dtype=np.uint8))
+    test_img.save(img_dir / "test_tile_001.png")
+
+    # Create dummy YOLO polygon label (class 0, 4 polygon points)
+    with open(lbl_dir / "test_tile_001.txt", "w", encoding="utf-8") as f:
+        f.write("0 0.2 0.2 0.5 0.2 0.5 0.6 0.2 0.6\n")
+
+    ds = SonarSegDataset(tmp_path, img_size=512, max_samples=3)
+    assert len(ds) == 1
 
     img_tensor, mask_tensor, cls_tensor = ds[0]
     assert img_tensor.shape == (3, 512, 512)
     assert mask_tensor.shape == (10, 512, 512)
     assert cls_tensor.shape == (10,)
+    assert cls_tensor[0] == 1.0
     assert 0.0 <= img_tensor.min() and img_tensor.max() <= 1.0
     assert 0.0 <= mask_tensor.min() and mask_tensor.max() <= 1.0
 

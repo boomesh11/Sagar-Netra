@@ -63,10 +63,8 @@ def test_capability_matrix_honest_degradation():
     client = TestClient(app)
 
     # Upload uncalibrated crop without navigation sidecar
-    img = Image.new("L", (256, 256), color=120)
-    buf = io.BytesIO()
-    img.save(buf, format="PNG")
-    buf.seek(0)
+    with open("tests/fixtures/wreck_real.png", "rb") as f:
+        buf = io.BytesIO(f.read())
 
     upload_resp = client.post(
         "/api/upload",

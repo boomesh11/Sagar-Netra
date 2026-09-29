@@ -25,15 +25,11 @@ def test_full_pipeline_with_navigation_metadata():
     """
     client = TestClient(app)
 
-    # 1. Create dummy sonar image
-    img = Image.new("L", (512, 512), color=110)
-    buf_img = io.BytesIO()
-    img.save(buf_img, format="PNG")
-    buf_img.seek(0)
-
-    # 2. Create dummy navigation CSV sidecar
-    nav_csv = "ping_idx,time_s,vessel_lat,vessel_lon,vessel_heading,altitude_m\n0,0.0,13.08512,80.29841,90.0,12.0\n"
-    buf_nav = io.BytesIO(nav_csv.encode("utf-8"))
+    # 1. Load real sonar fixture image and navigation sidecar
+    with open("tests/fixtures/wreck_real.png", "rb") as f:
+        buf_img = io.BytesIO(f.read())
+    with open("tests/fixtures/survey_nav_sample.csv", "rb") as f:
+        buf_nav = io.BytesIO(f.read())
 
     # 3. Upload to API
     resp = client.post(

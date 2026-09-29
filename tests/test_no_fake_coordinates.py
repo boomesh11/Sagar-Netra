@@ -25,11 +25,9 @@ def test_random_image_upload_no_fake_coordinates():
     """
     client = TestClient(app)
 
-    # Create dummy 512x512 grayscale sonar image
-    img = Image.new("L", (512, 512), color=128)
-    buf = io.BytesIO()
-    img.save(buf, format="PNG")
-    buf.seek(0)
+    # Use real unreferenced sonar crop fixture
+    with open("tests/fixtures/wreck_real.png", "rb") as f:
+        buf = io.BytesIO(f.read())
 
     response = client.post(
         "/api/upload",

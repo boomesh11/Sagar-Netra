@@ -11,6 +11,8 @@ h5py>=3.10
 pandas>=2.2
 pydantic>=2.6
 fastapi>=0.110
+python-multipart>=0.0.9
+
 uvicorn[standard]>=0.29
 websockets>=12.0
 sqlmodel>=0.0.16

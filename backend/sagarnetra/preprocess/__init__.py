@@ -29,6 +29,7 @@ from backend.sagarnetra.preprocess.features import (
 )
 from backend.sagarnetra.preprocess.tiler import extract_tiles, TiledWindow
 from backend.sagarnetra.preprocess.pipeline import preprocess_survey_pings, PreprocessResult
+from backend.sagarnetra.preprocess.modality import check_image_modality, ModalityCheckResult
 
 __all__ = [
     "detect_ping_quality",
@@ -52,4 +53,6 @@ __all__ = [
     "TiledWindow",
     "preprocess_survey_pings",
     "PreprocessResult",
+    "check_image_modality",
+    "ModalityCheckResult",
 ]

@@ -1,0 +1,248 @@
+{
+  "status": "BUILT_FROM_REAL_SEABED_ONLY",
+  "coreset_patches": 13107,
+  "total_training_tiles": 40,
+  "synthetic_tiles_count": 0,
+  "sources": [
+    {
+      "index": 0,
+      "file": "tests\\fixtures\\natural_seabed_negative.png",
+      "source": "AI4Shipwrecks_NOAA_EdgeTech2205",
+      "is_synthetic": false
+    },
+    {
+      "index": 1,
+      "file": "data\\datasets\\real_ai4shipwrecks_yolo\\train\\images\\neg_DM_Wilson_01.png",
+      "source": "AI4Shipwrecks_NOAA_EdgeTech2205",
+      "is_synthetic": false
+    },
+    {
+      "index": 2,
+      "file": "data\\datasets\\real_ai4shipwrecks_yolo\\train\\images\\neg_DM_Wilson_02.png",
+      "source": "AI4Shipwrecks_NOAA_EdgeTech2205",
+      "is_synthetic": false
+    },
+    {
+      "index": 3,
+      "file": "data\\datasets\\real_ai4shipwrecks_yolo\\train\\images\\neg_DM_Wilson_03.png",
+      "source": "AI4Shipwrecks_NOAA_EdgeTech2205",
+      "is_synthetic": false
+    },
+    {
+      "index": 4,
+      "file": "data\\datasets\\real_ai4shipwrecks_yolo\\train\\images\\neg_DM_Wilson_04.png",
+      "source": "AI4Shipwrecks_NOAA_EdgeTech2205",
+      "is_synthetic": false
+    },
+    {
+      "index": 5,
+      "file": "data\\datasets\\real_ai4shipwrecks_yolo\\train\\images\\neg_DM_Wilson_05.png",
+      "source": "AI4Shipwrecks_NOAA_EdgeTech2205",
+      "is_synthetic": false
+    },
+    {
+      "index": 6,
+      "file": "data\\datasets\\real_ai4shipwrecks_yolo\\train\\images\\neg_DM_Wilson_06.png",
+      "source": "AI4Shipwrecks_NOAA_EdgeTech2205",
+      "is_synthetic": false
+    },
+    {
+      "index": 7,
+      "file": "data\\datasets\\real_ai4shipwrecks_yolo\\train\\images\\neg_DM_Wilson_07.png",
+      "source": "AI4Shipwrecks_NOAA_EdgeTech2205",
+      "is_synthetic": false
+    },
+    {
+      "index": 8,
+      "file": "data\\datasets\\real_ai4shipwrecks_yolo\\train\\images\\neg_DM_Wilson_08.png",
+      "source": "AI4Shipwrecks_NOAA_EdgeTech2205",
+      "is_synthetic": false
+    },
+    {
+      "index": 9,
+      "file": "data\\datasets\\real_ai4shipwrecks_yolo\\train\\images\\neg_DM_Wilson_09.png",
+      "source": "AI4Shipwrecks_NOAA_EdgeTech2205",
+      "is_synthetic": false
+    },
+    {
+      "index": 10,
+      "file": "data\\datasets\\real_ai4shipwrecks_yolo\\train\\images\\neg_DM_Wilson_10.png",
+      "source": "AI4Shipwrecks_NOAA_EdgeTech2205",
+      "is_synthetic": false
+    },
+    {
+      "index": 11,
+      "file": "data\\datasets\\real_ai4shipwrecks_yolo\\train\\images\\neg_DM_Wilson_11.png",
+      "source": "AI4Shipwrecks_NOAA_EdgeTech2205",
+      "is_synthetic": false
+    },
+    {
+      "index": 12,
+      "file": "data\\datasets\\real_ai4shipwrecks_yolo\\train\\images\\neg_DM_Wilson_12.png",
+      "source": "AI4Shipwrecks_NOAA_EdgeTech2205",
+      "is_synthetic": false
+    },
+    {
+      "index": 13,
+      "file": "data\\datasets\\real_ai4shipwrecks_yolo\\train\\images\\neg_DM_Wilson_13.png",
+      "source": "AI4Shipwrecks_NOAA_EdgeTech2205",
+      "is_synthetic": false
+    },
+    {
+      "index": 14,
+      "file": "data\\datasets\\real_ai4shipwrecks_yolo\\train\\images\\neg_DM_Wilson_14.png",
+      "source": "AI4Shipwrecks_NOAA_EdgeTech2205",
+      "is_synthetic": false
+    },
+    {
+      "index": 15,
+      "file": "data\\datasets\\real_ai4shipwrecks_yolo\\train\\images\\neg_DM_Wilson_15.png",
+      "source": "AI4Shipwrecks_NOAA_EdgeTech2205",
+      "is_synthetic": false
+    },
+    {
+      "index": 16,
+      "file": "data\\datasets\\real_ai4shipwrecks_yolo\\train\\images\\neg_DM_Wilson_16.png",
+      "source": "AI4Shipwrecks_NOAA_EdgeTech2205",
+      "is_synthetic": false
+    },
+    {
+      "index": 17,
+      "file": "data\\datasets\\real_ai4shipwrecks_yolo\\train\\images\\neg_DM_Wilson_17.png",
+      "source": "AI4Shipwrecks_NOAA_EdgeTech2205",
+      "is_synthetic": false
+    },
+    {
+      "index": 18,
+      "file": "data\\datasets\\real_ai4shipwrecks_yolo\\train\\images\\neg_DM_Wilson_19.png",
+      "source": "AI4Shipwrecks_NOAA_EdgeTech2205",
+      "is_synthetic": false
+    },
+    {
+      "index": 19,
+      "file": "data\\datasets\\real_ai4shipwrecks_yolo\\train\\images\\neg_DM_Wilson_20.png",
+      "source": "AI4Shipwrecks_NOAA_EdgeTech2205",
+      "is_synthetic": false
+    },
+    {
+      "index": 20,
+      "file": "data\\datasets\\real_ai4shipwrecks_yolo\\train\\images\\neg_DM_Wilson_21.png",
+      "source": "AI4Shipwrecks_NOAA_EdgeTech2205",
+      "is_synthetic": false
+    },
+    {
+      "index": 21,
+      "file": "data\\datasets\\real_ai4shipwrecks_yolo\\train\\images\\neg_DM_Wilson_22.png",
+      "source": "AI4Shipwrecks_NOAA_EdgeTech2205",
+      "is_synthetic": false
+    },
+    {
+      "index": 22,
+      "file": "data\\datasets\\real_ai4shipwrecks_yolo\\train\\images\\neg_DR_Hanna_01.png",
+      "source": "AI4Shipwrecks_NOAA_EdgeTech2205",
+      "is_synthetic": false
+    },
+    {
+      "index": 23,
+      "file": "data\\datasets\\real_ai4shipwrecks_yolo\\train\\images\\neg_DR_Hanna_02.png",
+      "source": "AI4Shipwrecks_NOAA_EdgeTech2205",
+      "is_synthetic": false
+    },
+    {
+      "index": 24,
+      "file": "data\\datasets\\real_ai4shipwrecks_yolo\\train\\images\\neg_DR_Hanna_03.png",
+      "source": "AI4Shipwrecks_NOAA_EdgeTech2205",
+      "is_synthetic": false
+    },
+    {
+      "index": 25,
+      "file": "data\\datasets\\real_ai4shipwrecks_yolo\\train\\images\\neg_DR_Hanna_04.png",
+      "source": "AI4Shipwrecks_NOAA_EdgeTech2205",
+      "is_synthetic": false
+    },
+    {
+      "index": 26,
+      "file": "data\\datasets\\real_ai4shipwrecks_yolo\\train\\images\\neg_DR_Hanna_05.png",
+      "source": "AI4Shipwrecks_NOAA_EdgeTech2205",
+      "is_synthetic": false
+    },
+    {
+      "index": 27,
+      "file": "data\\datasets\\real_ai4shipwrecks_yolo\\train\\images\\neg_EB_Allen_01.png",
+      "source": "AI4Shipwrecks_NOAA_EdgeTech2205",
+      "is_synthetic": false
+    },
+    {
+      "index": 28,
+      "file": "data\\datasets\\real_ai4shipwrecks_yolo\\train\\images\\neg_EB_Allen_02.png",
+      "source": "AI4Shipwrecks_NOAA_EdgeTech2205",
+      "is_synthetic": false
+    },
+    {
+      "index": 29,
+      "file": "data\\datasets\\real_ai4shipwrecks_yolo\\train\\images\\neg_EB_Allen_03.png",
+      "source": "AI4Shipwrecks_NOAA_EdgeTech2205",
+      "is_synthetic": false
+    },
+    {
+      "index": 30,
+      "file": "data\\datasets\\real_ai4shipwrecks_yolo\\train\\images\\neg_EB_Allen_04.png",
+      "source": "AI4Shipwrecks_NOAA_EdgeTech2205",
+      "is_synthetic": false
+    },
+    {
+      "index": 31,
+      "file": "data\\datasets\\real_ai4shipwrecks_yolo\\train\\images\\neg_EB_Allen_05.png",
+      "source": "AI4Shipwrecks_NOAA_EdgeTech2205",
+      "is_synthetic": false
+    },
+    {
+      "index": 32,
+      "file": "data\\datasets\\real_ai4shipwrecks_yolo\\train\\images\\neg_EB_Allen_06.png",
+      "source": "AI4Shipwrecks_NOAA_EdgeTech2205",
+      "is_synthetic": false
+    },
+    {
+      "index": 33,
+      "file": "data\\datasets\\real_ai4shipwrecks_yolo\\train\\images\\neg_EB_Allen_07.png",
+      "source": "AI4Shipwrecks_NOAA_EdgeTech2205",
+      "is_synthetic": false
+    },
+    {
+      "index": 34,
+      "file": "data\\datasets\\real_ai4shipwrecks_yolo\\train\\images\\neg_EB_Allen_08.png",
+      "source": "AI4Shipwrecks_NOAA_EdgeTech2205",
+      "is_synthetic": false
+    },
+    {
+      "index": 35,
+      "file": "data\\datasets\\real_ai4shipwrecks_yolo\\train\\images\\neg_EB_Allen_09.png",
+      "source": "AI4Shipwrecks_NOAA_EdgeTech2205",
+      "is_synthetic": false
+    },
+    {
+      "index": 36,
+      "file": "data\\datasets\\real_ai4shipwrecks_yolo\\train\\images\\neg_EB_Allen_10.png",
+      "source": "AI4Shipwrecks_NOAA_EdgeTech2205",
+      "is_synthetic": false
+    },
+    {
+      "index": 37,
+      "file": "data\\datasets\\real_ai4shipwrecks_yolo\\train\\images\\neg_EB_Allen_11.png",
+      "source": "AI4Shipwrecks_NOAA_EdgeTech2205",
+      "is_synthetic": false
+    },
+    {
+      "index": 38,
+      "file": "data\\datasets\\real_ai4shipwrecks_yolo\\train\\images\\neg_EB_Allen_12.png",
+      "source": "AI4Shipwrecks_NOAA_EdgeTech2205",
+      "is_synthetic": false
+    },
+    {
+      "index": 39,
+      "file": "data\\datasets\\real_ai4shipwrecks_yolo\\train\\images\\neg_EB_Allen_13.png",
+      "source": "AI4Shipwrecks_NOAA_EdgeTech2205",
+      "is_synthetic": false
+    }
+  ]
+}

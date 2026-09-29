@@ -1,0 +1,76 @@
+<USER_REQUEST>
+You are working on SagarNetra (d:\SIHPS2), an SIH 2026 prototype for PS 26057
+(NIOT/MoES): AI-powered underwater debris detection in side-scan sonar (SSS).
+Read this entire brief before doing anything. Then execute ONLY the phase I
+name, stop at its gate, and report.
+
+=====================================================================
+GROUND RULES (apply to every phase — violating any of these = failure)
+=====================================================================
+1. EVIDENCE, NOT CLAIMS. Never mark anything "working" unless you ran it.
+   For every claim, paste the exact command you ran and its real output
+   (trimmed if long). "Written" ≠ "working".
+2. NO FAKE OUTPUTS. No hardcoded detections, classes, confidences,
+   coordinates, metrics, or heuristic stand-ins presented as model output.
+   If something isn't available, return null / "UNAVAILABLE" /
+   "PENDING_BENCHMARK" and say so in the UI.
+3. ONE ENGINE. Python (backend/sagarnetra) is the single source of truth
+   for all analysis. The Next.js app only uploads files and displays
+   results. Do not add new analysis logic in TypeScript.
+4. NO SCOPE CREEP. Do not touch WebSocket streaming, change detection,
+   or coverage grid until I explicitly unfreeze them. Do not add
+   new features that are not in the current phase.
+5. NO TUNING TO TEST IMAGES. Never add rules, thresholds, or special cases
+   that key on a specific test image, filename, folder, or image size.
+   Inference must never read filenames or labels.
+6. Windows environment (PowerShell). Give commands that work there.
+   Pin dependencies in backend/requirements.txt.
+7. If something is blocked (missing data, missing GPU, broken library),
+   STOP and tell me exactly what you need. Do not simulate around it.
+8. At the end of each phase output: (a) what changed (files),
+   (b) commands run + real output, (c) gate checklist with PASS/FAIL,
+   (d) known issues. Nothing else.
+
+===================================================================
+<truncated 11248 bytes>
+zed/suppressed
+   - image-only input: geo.status == UNAVAILABLE, lat/lon null
+   - optical photo: invalid_input
+   - open-set folder (bicycle/ladder/cage synthetic): % routed to
+     unknown_manmade/other_manmade; % wrongly routed to net_debris
+b. Blind protocol: inference never sees filenames/labels; ground truth is
+   compared after prediction.
+c. Metrics report: per-class P/R, FP per image on hard negatives,
+   net false-assignment rate, unknown routing accuracy, fragments per
+   object. Save to reports/metrics.json and show in the System view.
+GATE: pytest green or failures honestly listed; metrics.json saved.
+
+=====================================================================
+PHASE 9 — EDGE PROFILE
+=====================================================================
+Tasks: measure ONNX Runtime inference time per 640px tile on this
+machine (CPU, and GPU if available) and full-pipeline time per image.
+Display measured numbers in the System view. Jetson/INT8 stays labelled
+"Target — pending benchmark" unless actually run on the device.
+GATE: timing table with real measurements.
+
+=====================================================================
+FROZEN (do not work on unless I unfreeze)
+=====================================================================
+WebSocket streaming, change detection, coverage grid, PDF work orders,
+multi-pass persistence, analyst feedback loop. In the UI, either hide
+these views or label them "Experimental — not connected".
+
+Start now with PHASE 0 only.
+</USER_REQUEST>
+<ADDITIONAL_METADATA>
+The current local time is: 2026-09-27T09:18:04+05:30.
+
+The user's current state is as follows:
+Other open documents:
+- d:\SIHPS2\backend\sagarnetra\geo\error_budget.py (LANGUAGE_PYTHON)
+- d:\SIHPS2\training\export_onnx.py (LANGUAGE_PYTHON)
+- d:\SIHPS2\training\train_yolo.py (LANGUAGE_PYTHON)
+- d:\SIHPS2\backend\sagarnetra\detect\fuse_candidates.py (LANGUAGE_PYTHON)
+- d:\SIHPS2\backend\sagarnetra\preprocess\despeckle.py (LANGUAGE_PYTHON)
+</ADDITIONAL_METADATA>

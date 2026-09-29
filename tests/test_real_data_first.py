@@ -81,6 +81,7 @@ def test_metrics_source_separation():
 
     real_data = json.loads(real_f.read_text(encoding="utf-8"))
     assert real_data["source_type"] == "real"
+    assert real_data["status"] == "PENDING_BENCHMARK"
     # Ghost net in real metrics must be NOT_ESTABLISHED
     assert real_data["classes"]["ghost_net"]["status"] == "NOT_ESTABLISHED"
     assert "pending verified field data" in real_data["classes"]["ghost_net"]["disclaimer"]
@@ -90,15 +91,17 @@ def test_metrics_source_separation():
 
     hybrid_data = json.loads(hybrid_f.read_text(encoding="utf-8"))
     assert hybrid_data["source_type"] == "hybrid"
+    assert hybrid_data["status"] == "PENDING_BENCHMARK"
     assert "ghost_net" in hybrid_data["classes"]
-    assert hybrid_data["classes"]["ghost_net"]["recall_at_iou50"] >= 0.80
+    assert hybrid_data["classes"]["ghost_net"]["status"] == "PENDING_BENCHMARK"
 
     sim_data = json.loads(sim_f.read_text(encoding="utf-8"))
     assert sim_data["source_type"] == "sim"
+    assert sim_data["status"] == "PENDING_BENCHMARK"
 
 
 def test_api_load_real_survey():
-    """Verify loading real survey populates detections with source_type='REAL'."""
+    """Verify loading real survey without raw acoustic file returns PENDING_BENCHMARK."""
     client = TestClient(app)
     payload = {
         "survey_id": "SRV_TEST_REAL",
@@ -108,19 +111,32 @@ def test_api_load_real_survey():
     response = client.post("/api/surveys/load_real", json=payload)
     assert response.status_code == 200
     data = response.json()
-    assert data["status"] == "LOADED_REAL_SURVEY"
+    assert data["status"] == "PENDING_BENCHMARK"
     assert data["source_type"] == "REAL"
-
-    # Check targets returned for this survey
-    targets_resp = client.get(f"/api/targets?survey_id=SRV_TEST_REAL")
-    assert targets_resp.status_code == 200
-    targets_data = targets_resp.json()
-    assert targets_data["count"] >= 1
-    assert targets_data["targets"][0]["source_type"] == "REAL"
 
 
 def test_api_target_inspection_layers():
     """Verify Target Inspector layers endpoint returns all 8 aligned inspection layers."""
+    from backend.sagarnetra.api.store import SurveyStore
+    store = SurveyStore()
+    store.create_survey(survey_id="SRV_INSPECT_01", site_name="Inspection_Test_Site")
+    store.save_detection(
+        target_id="TGT_INSPECT_01",
+        survey_id="SRV_INSPECT_01",
+        class_name="wreck_debris",
+        hazard_confidence=91.0,
+        status="CONFIRMED_HAZARD",
+        priority=0.85,
+        lat=13.085,
+        lon=80.298,
+        utm_easting=423950.0,
+        utm_northing=1446800.0,
+        zone=44,
+        r95_m=2.1,
+        length_m=12.0,
+        width_m=3.0,
+        height_m=2.5,
+    )
     client = TestClient(app)
     # Get any available target ID
     targets_resp = client.get("/api/targets")

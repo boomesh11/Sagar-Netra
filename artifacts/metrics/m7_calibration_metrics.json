@@ -1,9 +1,0 @@
-{
-  "temperature": 0.083,
-  "uncalibrated_ece": 0.3896,
-  "calibrated_ece": 0.2893,
-  "uncalibrated_brier": 0.2428,
-  "calibrated_brier": 0.2106,
-  "target_ece_achieved": false,
-  "num_validation_instances": 200
-}

@@ -10,9 +10,11 @@ dist/
 build/
 *.so
 .venv/
+.venv_old/
 venv/
 env/
 .env
+.env.local
 
 # Data (never commit raw or large binary data)
 data/raw/
@@ -21,23 +23,39 @@ data/processed/
 data/datasets/
 data/demo_logs/
 data/real/indian/**/raw/
+data/real/shipwrecks/
 artifacts/cache/
+artifacts/runs/
+artifacts/surveys/
+artifacts/test_debug/
+artifacts/uploads/
 !data/sources.yaml
 !data/dataset_manifest.json
 !data/splits/
 !data/licenses/
 !data/manifests/
 
-# Artifacts (generated)
+# Artifacts (generated / large binaries)
 artifacts/models/*.pt
 artifacts/models/*.onnx
 artifacts/models/*.engine
+artifacts/models/*.npz
 artifacts/pod/*.npz
 artifacts/reports/
+
+# Large binary / model files in root
+*.pt
+*.npz
+*.onnx
+*.engine
+
+# SQLite database
+*.db
 
 # Logs
 *.log
 logs/
+phase*.log
 
 # IDE
 .vscode/
@@ -48,13 +66,27 @@ logs/
 .DS_Store
 Thumbs.db
 
-# Node
+# Node / Next.js
 node_modules/
+.next/
 frontend/dist/
 frontend/.vite/
+tsconfig.tsbuildinfo
 
 # Docker
 *.env.local
 
 # HuggingFace token
 .hf_token
+
+# Test data / uploads
+test_samples/
+test_upload_dataset/
+
+# Scratch / generated reports
+scratch/
+reports/
+audit/
+
+# Pytest cache
+.pytest_cache/
